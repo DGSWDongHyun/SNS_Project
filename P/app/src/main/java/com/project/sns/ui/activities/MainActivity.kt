@@ -34,6 +34,10 @@ class MainActivity : AppCompatActivity() {
         NavigationUI.setupWithNavController(navView, navController)
         //end. - navView
 
+        mainBinding?.fab!!.setOnClickListener {
+            
+        }
+
         if(mainViewModel!!.liveAdapter.value?.getData() != null)
             postList = mainViewModel!!.liveAdapter.value!!.getData()
 
