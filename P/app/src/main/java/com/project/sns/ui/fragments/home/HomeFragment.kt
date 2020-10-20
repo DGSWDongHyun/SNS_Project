@@ -54,28 +54,17 @@ class HomeFragment : Fragment() {
        arrayAdapterGenre!!.setDropDownViewResource(R.layout.simple_spinner_dropdown_item)
         mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
 
-        database.child("board").child("path").push().setValue(PostData("hi", "lol", null, System.currentTimeMillis(), "green"))
-
         readBoard()
         readCategory()
 
+
         homeBinding?.spinner?.setAdapter(arrayAdapterGenre!!)
         homeBinding?.spinner?.setOnItemSelectedListener { view, position, id, item ->
-            sortData("$item")
         }
 
 
         homeBinding!!.recyclerSubject.adapter = writeAdapter
         homeBinding!!.recyclerSubject.layoutManager = LinearLayoutManager(context)
-    }
-    fun sortData(item : String){
-        for(idx in 0 until postDataList!!.size){
-            postDataList!!.clear()
-            if(postDataList!![idx].genre.toString().equals(item)){
-                postDataList!!.add(PostData(postDataList!![idx].title, postDataList!![idx].content, postDataList!![idx].image_url, postDataList!![idx].dateTime, postDataList!![idx].genre))
-                writeAdapter!!.setData(postDataList)
-            }
-        }
     }
     fun dataClear(snapshot: DataSnapshot, requestCode: Int){
 
@@ -86,7 +75,7 @@ class HomeFragment : Fragment() {
             }
             2 -> {
                 val dataObject = snapshot.getValue(PostData::class.java)
-                postDataList!!.add(0, PostData(dataObject!!.title, dataObject!!.content, dataObject!!.image_url, dataObject!!.dateTime, dataObject!!.genre))
+                postDataList!!.add(0, PostData(dataObject!!.title, dataObject.content, dataObject.image_url, dataObject.dateTime, dataObject.genre, dataObject.viewType))
             }
         }
 
@@ -101,6 +90,7 @@ class HomeFragment : Fragment() {
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
                 dataClear(snapshot, 1)
+
             }
 
             override fun onChildRemoved(snapshot: DataSnapshot) {
@@ -149,7 +139,6 @@ class HomeFragment : Fragment() {
     }
         override fun onStop() {
             mainViewModel!!.liveAdapter.value = writeAdapter
-
             super.onStop()
         }
     }

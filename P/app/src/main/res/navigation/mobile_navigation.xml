@@ -17,15 +17,15 @@
 
     <fragment
         android:id="@+id/navigation_dashboard"
-        android:name="com.project.sns.ui.fragments.dashboard.DashboardFragment"
+        android:name="com.project.sns.ui.fragments.dashboard.PostClassFragment"
         android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        tools:layout="@layout/fragment_post_class" />
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="com.project.sns.ui.fragments.notifications.NotificationsFragment"
+        android:name="com.project.sns.ui.fragments.notifications.ProfileFragment"
         android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        tools:layout="@layout/fragment_profile" />
     <fragment
         android:id="@+id/registerFragment"
         android:name="com.project.sns.ui.activities.register.ui.main.RegisterFragment"

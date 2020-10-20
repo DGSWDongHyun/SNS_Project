@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 
 import androidx.lifecycle.ViewModel
 import com.github.mikephil.charting.data.PieEntry
+import com.project.sns.data.write.PostData
 import com.project.sns.ui.adapters.WriteAdapter
 
 

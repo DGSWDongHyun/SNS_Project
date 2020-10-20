@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">SNS</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_home">메인</string>
+    <string name="title_dashboard">과목 신청</string>
+    <string name="title_notifications">프로필 정보</string>
     <string name="main">ㅎㅇ</string>
     <string name="title_activity_register">RegisterActivity</string>
     <string name="prompt_email">Email</string>
