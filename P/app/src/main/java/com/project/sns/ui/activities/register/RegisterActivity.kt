@@ -4,12 +4,17 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.project.sns.R
 import com.project.sns.ui.activities.register.ui.main.RegisterFragment
+import kotlin.system.exitProcess
 
 class RegisterActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.register_activity)
+        setContentView(R.layout.activity_register)
 
+    }
+
+    override fun onBackPressed() {
+        return
     }
 }

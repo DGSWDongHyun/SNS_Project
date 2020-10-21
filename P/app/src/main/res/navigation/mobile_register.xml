@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/mobile_register"
+    app:startDestination="@id/registerFragment">
+
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.project.sns.ui.activities.register.ui.main.RegisterFragment"
+        android:label="RegisterFragment" />
+</navigation>

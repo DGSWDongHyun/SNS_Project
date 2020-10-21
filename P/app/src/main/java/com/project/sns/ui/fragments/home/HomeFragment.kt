@@ -56,7 +56,6 @@ class HomeFragment : Fragment() {
 
         readBoard()
 
-
         homeBinding!!.recyclerSubject.adapter = writeAdapter
         homeBinding!!.recyclerSubject.layoutManager = LinearLayoutManager(context)
     }
@@ -134,7 +133,6 @@ class HomeFragment : Fragment() {
 
     override fun onStart() {
         readCategory()
-
         homeBinding?.spinner?.setAdapter(arrayAdapterGenre!!)
         homeBinding?.spinner?.setOnItemSelectedListener { view, position, id, item ->
         }

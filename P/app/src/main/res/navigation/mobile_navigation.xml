@@ -34,8 +34,4 @@
         tools:layout="@layout/fragment_profile" >
 
     </fragment>
-    <fragment
-        android:id="@+id/registerFragment"
-        android:name="com.project.sns.ui.activities.register.ui.main.RegisterFragment"
-        android:label="RegisterFragment" />
 </navigation>
