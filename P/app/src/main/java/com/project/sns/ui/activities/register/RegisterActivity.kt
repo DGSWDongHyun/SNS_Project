@@ -3,8 +3,6 @@ package com.project.sns.ui.activities.register
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.project.sns.R
-import com.project.sns.ui.activities.register.ui.main.RegisterFragment
-import kotlin.system.exitProcess
 
 class RegisterActivity : AppCompatActivity() {
 

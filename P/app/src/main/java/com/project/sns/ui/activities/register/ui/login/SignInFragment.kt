@@ -1,4 +1,4 @@
-package com.project.sns.ui.activities.register.ui.main
+package com.project.sns.ui.activities.register.ui.login
 
 import android.content.Intent
 import android.graphics.Color
@@ -8,21 +8,23 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.navigation.findNavController
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
-import com.project.sns.databinding.FragmentRegisterInfoBinding
+import com.project.sns.R
+import com.project.sns.databinding.FragmentSignInBinding
 import com.project.sns.ui.activities.MainActivity
 
 
-class RegisterFragment : Fragment() {
+class SignInFragment : Fragment() {
 
     private val firebaseAuth : FirebaseAuth = FirebaseAuth.getInstance()
-    private var registerBinding : FragmentRegisterInfoBinding ?= null
+    private var registerBinding : FragmentSignInBinding ?= null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
-        registerBinding = FragmentRegisterInfoBinding.inflate(layoutInflater)
+        registerBinding = FragmentSignInBinding.inflate(layoutInflater)
 
         return registerBinding!!.root
     }
@@ -33,21 +35,22 @@ class RegisterFragment : Fragment() {
         registerBinding!!.registerText.setTextColor(Color.BLUE)
 
         registerBinding!!.registerText.setOnClickListener {
-
+            view?.findNavController()!!.navigate(R.id.action_registerFragment_to_signUpFragment)
         }
 
         registerBinding!!.loginButton.setOnClickListener {
-            doLogin()
+            if(!registerBinding!!.idTextInput.text!!.isEmpty() && ! registerBinding!!.passwordTextInput.text!!.isEmpty()){
+                doLogin()
+            }
         }
     }
     private fun doLogin() {
         firebaseAuth.signInWithEmailAndPassword(registerBinding!!.idTextInput.text.toString(), registerBinding!!.passwordTextInput.text.toString())
                 .addOnCompleteListener(requireActivity(), OnCompleteListener<AuthResult?> { task ->
                     if (task.isSuccessful) {
-                        val intent = Intent(requireContext(), MainActivity::class.java)
-                        startActivity(intent)
+                        requireActivity().finish()
                     } else {
-                        Toast.makeText(requireContext(), "로그인 오류", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), "로그인 오류, 아이디나 비밀번호에 오류가 없는지 다시 확인하세요.", Toast.LENGTH_SHORT).show()
                     }
                 })
     }

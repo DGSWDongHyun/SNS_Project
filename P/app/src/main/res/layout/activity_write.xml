@@ -8,6 +8,7 @@
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_write"
+        style="@style/Theme.AppCompat.Light.DarkActionBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
@@ -15,19 +16,19 @@
         android:layout_marginStart="10dp"
         android:layout_marginEnd="15dp"
         android:layout_marginBottom="30dp"
-        app:fabType="roundedSquare"
+        app:backgroundTint="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.95"
-        app:srcCompat="@drawable/ic_baseline_create_24" />
+        app:srcCompat="@drawable/ic_baseline_create_24_2" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView3"
         android:layout_width="0dp"
-        android:layout_height="65dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -42,8 +43,9 @@
             android:layout_height="match_parent">
 
             <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
                 android:layout_width="0dp"
-                android:layout_height="45dp"
+                android:layout_height="60dp"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -55,7 +57,6 @@
                     android:id="@+id/titleEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
                     android:hint="제목"
                     android:textStyle="bold" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -81,12 +82,13 @@
             android:layout_height="match_parent">
 
             <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginStart="10dp"
-                android:layout_marginTop="25dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginEnd="10dp"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="8dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -96,7 +98,6 @@
                     android:id="@+id/contentEditText"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@android:color/transparent"
                     android:gravity="top"
                     android:hint="글 내용" />
             </com.google.android.material.textfield.TextInputLayout>
