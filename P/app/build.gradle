@@ -52,6 +52,7 @@ dependencies {
     implementation 'com.nightonke:boommenu:2.1.1'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
     implementation 'com.robertlevonyan.view:CustomFloatingActionButton:3.0.1'
+    implementation 'com.airbnb.android:lottie:3.4.4'
 
 }
 repositories {

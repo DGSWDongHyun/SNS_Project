@@ -1,4 +1,4 @@
-package com.project.sns.ui.fragments.notifications
+package com.project.sns.ui.fragments.profile
 
 import android.graphics.Color
 import android.os.Bundle
@@ -10,14 +10,13 @@ import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.utils.ColorTemplate
-import com.project.sns.R
-import com.project.sns.databinding.FragmentNotificationsBinding
+import com.project.sns.databinding.FragmentProfileBinding
 
 class ProfileFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
-        val view = FragmentNotificationsBinding.inflate(layoutInflater)
+        val view = FragmentProfileBinding.inflate(layoutInflater)
 
         view.chart1.getDescription().setEnabled(false)
 
@@ -34,12 +33,12 @@ class ProfileFragment : Fragment() {
 
     protected fun generatePieData(): PieData? {
         val count = 2
-        val value : Float = 100F
+        val value : Float = 50F
         val entries1: ArrayList<PieEntry> = ArrayList()
         for (i in 0 until count) {
-            entries1.add(PieEntry(value, "Quarter " + (i + 1)))
+            entries1.add(PieEntry(value, "과목 " + (i + 1)))
         }
-        val ds1 = PieDataSet(entries1, "Quarterly Revenues 2015")
+        val ds1 = PieDataSet(entries1, "최근 공부 시간")
         ds1.setColors(*ColorTemplate.VORDIPLOM_COLORS)
         ds1.sliceSpace = 2f
         ds1.valueTextColor = Color.WHITE

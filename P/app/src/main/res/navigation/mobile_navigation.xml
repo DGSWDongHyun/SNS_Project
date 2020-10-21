@@ -10,22 +10,30 @@
         android:name="com.project.sns.ui.fragments.home.HomeFragment"
         android:label="@string/title_home"
         tools:layout="@layout/fragment_home" >
+
         <action
-            android:id="@+id/action_navigation_home_to_registerFragment"
-            app:destination="@id/registerFragment" />
+            android:id="@+id/action_navigation_home_to_navigation_dashboard3"
+            app:destination="@id/navigation_dashboard" />
     </fragment>
 
     <fragment
         android:id="@+id/navigation_dashboard"
-        android:name="com.project.sns.ui.fragments.dashboard.PostClassFragment"
+        android:name="com.project.sns.ui.fragments.post.PostClassFragment"
         android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_post_class" />
+        tools:layout="@layout/fragment_post_class" >
+
+        <action
+            android:id="@+id/action_navigation_dashboard_to_navigation_notifications3"
+            app:destination="@id/navigation_notifications" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="com.project.sns.ui.fragments.notifications.ProfileFragment"
+        android:name="com.project.sns.ui.fragments.profile.ProfileFragment"
         android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_profile" />
+        tools:layout="@layout/fragment_profile" >
+
+    </fragment>
     <fragment
         android:id="@+id/registerFragment"
         android:name="com.project.sns.ui.activities.register.ui.main.RegisterFragment"

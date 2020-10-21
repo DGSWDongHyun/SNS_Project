@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.fragments.notifications.ProfileFragment">
+    tools:context=".ui.fragments.profile.ProfileFragment">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView2"
@@ -17,7 +17,7 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.17000002">
+        app:layout_constraintVertical_bias="0.25">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -41,10 +41,12 @@
         android:layout_marginStart="20dp"
         android:text="이름님의 최근 공부 시간입니다."
         android:textSize="18sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/cardView2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.645" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

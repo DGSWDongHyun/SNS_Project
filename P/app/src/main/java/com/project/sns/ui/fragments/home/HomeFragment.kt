@@ -55,12 +55,6 @@ class HomeFragment : Fragment() {
         mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
 
         readBoard()
-        readCategory()
-
-
-        homeBinding?.spinner?.setAdapter(arrayAdapterGenre!!)
-        homeBinding?.spinner?.setOnItemSelectedListener { view, position, id, item ->
-        }
 
 
         homeBinding!!.recyclerSubject.adapter = writeAdapter
@@ -136,6 +130,15 @@ class HomeFragment : Fragment() {
             }
         })
         //end
+    }
+
+    override fun onStart() {
+        readCategory()
+
+        homeBinding?.spinner?.setAdapter(arrayAdapterGenre!!)
+        homeBinding?.spinner?.setOnItemSelectedListener { view, position, id, item ->
+        }
+        super.onStart()
     }
         override fun onStop() {
             mainViewModel!!.liveAdapter.value = writeAdapter
