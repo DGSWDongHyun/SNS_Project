@@ -25,21 +25,25 @@ class MainActivity : AppCompatActivity() {
 
     var mainBinding : ActivityMainBinding ?= null
     var mainViewModel : MainViewModel ?= null
-    var postList : List<PostData> = arrayListOf()
-
-    private val REQUEST_POST = 100
     lateinit var database : DatabaseReference
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mainBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(mainBinding?.root)
-        database = Firebase.database.reference
-        mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
 
-        startActivity(Intent(this, IntroActivity::class.java))
 
-        initLayout();
+        initCallback() // viewModel, database initialize.
+        startActivity(Intent(this, IntroActivity::class.java)) // call loading screen.
+        initLayout() // initLayout
     }
+
+    private fun initCallback(){
+        database = Firebase.database.reference
+
+        mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+    }
+
     private fun initLayout(){
         //init navView.
         val navView = findViewById<BottomNavigationView>(R.id.nav_view)
@@ -47,12 +51,6 @@ class MainActivity : AppCompatActivity() {
         val navController = Navigation.findNavController(this, R.id.nav_host_fragment)
         NavigationUI.setupWithNavController(navView, navController)
         //end. - navView
-
-        mainBinding?.fab!!.setOnClickListener {
-            val intent = Intent(this, WriteActivity::class.java)
-            startActivityForResult(intent, REQUEST_POST)
-            overridePendingTransition(R.anim.visible, R.anim.invisible);
-        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -64,5 +62,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
         super.onActivityResult(requestCode, resultCode, data)
+    }
+    companion object{
+        const val REQUEST_POST = 100
     }
 }

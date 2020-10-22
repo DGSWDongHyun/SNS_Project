@@ -2,6 +2,7 @@ package com.project.sns.ui.activities.register.ui.login
 
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.Paint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -32,14 +33,19 @@ class SignInFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
+        initLayout();
+    }
+    private fun initLayout(){
+
         registerBinding!!.registerText.setTextColor(Color.BLUE)
+        registerBinding!!.registerText.paintFlags = Paint.UNDERLINE_TEXT_FLAG
 
         registerBinding!!.registerText.setOnClickListener {
             view?.findNavController()!!.navigate(R.id.action_registerFragment_to_signUpFragment)
         }
 
         registerBinding!!.loginButton.setOnClickListener {
-            if(!registerBinding!!.idTextInput.text!!.isEmpty() && ! registerBinding!!.passwordTextInput.text!!.isEmpty()){
+            if (!registerBinding!!.idTextInput.text!!.isEmpty() && !registerBinding!!.passwordTextInput.text!!.isEmpty()) {
                 doLogin()
             }
         }

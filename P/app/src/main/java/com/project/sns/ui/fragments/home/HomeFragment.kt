@@ -2,6 +2,7 @@ package com.project.sns.ui.fragments.home
 
 import android.R
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.AttributeSet
 import android.util.Log
@@ -23,6 +24,8 @@ import com.google.firebase.ktx.Firebase
 import com.project.sns.data.category.Genre
 import com.project.sns.data.write.PostData
 import com.project.sns.databinding.FragmentHomeBinding
+import com.project.sns.ui.activities.MainActivity
+import com.project.sns.ui.activities.write.WriteActivity
 import com.project.sns.ui.adapters.WriteAdapter
 import com.project.sns.ui.viewmodel.MainViewModel
 
@@ -46,7 +49,11 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
+        homeBinding?.fab!!.setOnClickListener {
+            val intent = Intent(requireContext(), WriteActivity::class.java)
+            startActivityForResult(intent, MainActivity.REQUEST_POST)
+            requireActivity().overridePendingTransition(com.project.sns.R.anim.visible, com.project.sns.R.anim.invisible);
+        }
 
         writeAdapter = WriteAdapter(requireContext()) { }
         database = Firebase.database.reference
@@ -142,4 +149,4 @@ class HomeFragment : Fragment() {
             mainViewModel!!.liveAdapter.value = writeAdapter
             super.onStop()
         }
-    }
+}

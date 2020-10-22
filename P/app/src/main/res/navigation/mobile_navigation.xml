@@ -13,7 +13,17 @@
 
         <action
             android:id="@+id/action_navigation_home_to_navigation_dashboard3"
-            app:destination="@id/navigation_dashboard" />
+            app:destination="@id/navigation_dashboard"
+            app:enterAnim="@anim/visible"
+            app:exitAnim="@anim/invisible" />
+        <action
+            android:id="@+id/action_navigation_home_to_navigation_notifications"
+            app:destination="@id/navigation_notifications"
+            app:enterAnim="@anim/visible"
+            app:exitAnim="@anim/invisible" />
+        <action
+            android:id="@+id/action_navigation_home_to_navigation_notifications2"
+            app:destination="@id/navigation_notifications" />
     </fragment>
 
     <fragment
@@ -24,7 +34,19 @@
 
         <action
             android:id="@+id/action_navigation_dashboard_to_navigation_notifications3"
-            app:destination="@id/navigation_notifications" />
+            app:destination="@id/navigation_notifications"
+            app:enterAnim="@anim/visible"
+            app:exitAnim="@anim/invisible" />
+        <action
+            android:id="@+id/action_navigation_dashboard_to_navigation_home"
+            app:destination="@id/navigation_home"
+            app:enterAnim="@anim/visible"
+            app:exitAnim="@anim/invisible" />
+        <action
+            android:id="@+id/action_navigation_dashboard_to_navigation_home2"
+            app:destination="@id/navigation_home"
+            app:enterAnim="@anim/visible"
+            app:exitAnim="@anim/invisible" />
     </fragment>
 
     <fragment
@@ -33,5 +55,20 @@
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_profile" >
 
+        <action
+            android:id="@+id/action_navigation_notifications_to_navigation_dashboard"
+            app:destination="@id/navigation_dashboard"
+            app:enterAnim="@anim/visible"
+            app:exitAnim="@anim/invisible" />
+        <action
+            android:id="@+id/action_navigation_notifications_to_navigation_home"
+            app:destination="@id/navigation_home"
+            app:enterAnim="@anim/visible"
+            app:exitAnim="@anim/invisible" />
+        <action
+            android:id="@+id/action_navigation_notifications_to_navigation_home2"
+            app:destination="@id/navigation_home"
+            app:enterAnim="@anim/visible"
+            app:exitAnim="@anim/invisible" />
     </fragment>
 </navigation>

@@ -2,6 +2,7 @@ package com.project.sns.ui.activities.register.ui.register
 
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.Paint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -24,17 +25,21 @@ class SignUpFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         signUpFragment = FragmentSignUpBinding.inflate(layoutInflater)
-
         return signUpFragment!!.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        initLayout();
+    }
+    private fun initLayout(){
         signUpFragment!!.loginText.setTextColor(Color.BLUE)
+        signUpFragment!!.loginText.paintFlags = Paint.UNDERLINE_TEXT_FLAG;
 
         signUpFragment!!.registerButton.setOnClickListener {
-            if(!signUpFragment!!.idTextInput.text!!.isEmpty() && ! signUpFragment!!.passwordTextInput.text!!.isEmpty()) {
+            if(signUpFragment!!.idTextInput.text!!.isNotEmpty()
+                    && signUpFragment!!.passwordTextInput.text!!.isNotEmpty()) {
                 doRegister()
             }
         }
@@ -42,7 +47,6 @@ class SignUpFragment : Fragment() {
         signUpFragment!!.loginText.setOnClickListener {
             view?.findNavController()!!.navigate(R.id.action_signUpFragment_to_registerFragment)
         }
-
     }
     private fun doRegister(){
         firebaseAuth.createUserWithEmailAndPassword(signUpFragment!!.idTextInput.text.toString(), signUpFragment!!.passwordTextInput.text.toString())

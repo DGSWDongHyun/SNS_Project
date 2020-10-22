@@ -9,6 +9,8 @@
         android:label="RegisterFragment" >
         <action
             android:id="@+id/action_registerFragment_to_signUpFragment"
+            app:enterAnim="@anim/visible"
+            app:exitAnim="@anim/invisible"
             app:destination="@id/signUpFragment" />
     </fragment>
     <fragment
@@ -17,6 +19,8 @@
         android:label="SignUpFragment" >
         <action
             android:id="@+id/action_signUpFragment_to_registerFragment"
-            app:destination="@id/registerFragment" />
+            app:destination="@id/registerFragment"
+            app:enterAnim="@anim/visible"
+            app:exitAnim="@anim/invisible" />
     </fragment>
 </navigation>

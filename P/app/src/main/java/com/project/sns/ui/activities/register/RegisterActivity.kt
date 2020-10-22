@@ -9,10 +9,9 @@ class RegisterActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
-
     }
 
-    override fun onBackPressed() {
+    override fun onBackPressed() { // cannot use back-pressed button.
         return
     }
 }
