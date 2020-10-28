@@ -1,6 +1,8 @@
 package com.project.sns.ui.activities.register.ui.register
 
+import android.content.Context.MODE_PRIVATE
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.Paint
 import android.os.Bundle
@@ -13,7 +15,11 @@ import androidx.navigation.findNavController
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import com.project.sns.R
+import com.project.sns.data.user.User
 import com.project.sns.databinding.FragmentSignUpBinding
 import com.project.sns.ui.activities.MainActivity
 
@@ -22,7 +28,8 @@ class SignUpFragment : Fragment() {
 
     private val firebaseAuth : FirebaseAuth = FirebaseAuth.getInstance()
     var signUpFragment : FragmentSignUpBinding ?= null
-
+    private lateinit var database: DatabaseReference
+    private var sharedPreferences: SharedPreferences ?= null
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         signUpFragment = FragmentSignUpBinding.inflate(layoutInflater)
         return signUpFragment!!.root
@@ -34,6 +41,8 @@ class SignUpFragment : Fragment() {
         initLayout();
     }
     private fun initLayout(){
+        sharedPreferences = requireContext().getSharedPreferences("userName", MODE_PRIVATE)
+        database = Firebase.database.reference
         signUpFragment!!.loginText.setTextColor(Color.BLUE)
         signUpFragment!!.loginText.paintFlags = Paint.UNDERLINE_TEXT_FLAG;
 
@@ -52,8 +61,13 @@ class SignUpFragment : Fragment() {
         firebaseAuth.createUserWithEmailAndPassword(signUpFragment!!.idTextInput.text.toString(), signUpFragment!!.passwordTextInput.text.toString())
                 .addOnCompleteListener(requireActivity(), OnCompleteListener<AuthResult?> { task ->
                     if (task.isSuccessful) {
+                        database.child("user").push().setValue(User(signUpFragment!!.nameTextInput.text.toString(), signUpFragment!!.idTextInput.text.toString()))
                         val intent = Intent(requireContext(), MainActivity::class.java)
                         startActivity(intent)
+                        val editor = sharedPreferences?.edit()
+                        editor?.putString("userName", signUpFragment!!.nameTextInput.text.toString())
+                        editor?.commit()
+
                         requireActivity().finish()
                     } else {
                         Toast.makeText(requireContext(), "등록 에러", Toast.LENGTH_SHORT).show()
