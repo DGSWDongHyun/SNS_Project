@@ -41,7 +41,7 @@ class SignUpFragment : Fragment() {
         initLayout();
     }
     private fun initLayout(){
-        sharedPreferences = requireContext().getSharedPreferences("userName", MODE_PRIVATE)
+        sharedPreferences = requireContext().getSharedPreferences("Account", MODE_PRIVATE)
         database = Firebase.database.reference
         signUpFragment!!.loginText.setTextColor(Color.BLUE)
         signUpFragment!!.loginText.paintFlags = Paint.UNDERLINE_TEXT_FLAG;
@@ -67,6 +67,8 @@ class SignUpFragment : Fragment() {
                         startActivity(intent)
                         val editor = sharedPreferences?.edit()
                         editor?.putString("userName", signUpFragment!!.nameTextInput.text.toString())
+                        editor?.putString("Email", signUpFragment!!.idTextInput.text.toString())
+                        editor?.putString("PassWord", signUpFragment!!.passwordTextInput.text.toString())
                         editor?.commit()
 
                         requireActivity().finish()
