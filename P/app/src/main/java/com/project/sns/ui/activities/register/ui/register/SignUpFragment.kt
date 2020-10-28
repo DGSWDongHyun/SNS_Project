@@ -61,7 +61,8 @@ class SignUpFragment : Fragment() {
         firebaseAuth.createUserWithEmailAndPassword(signUpFragment!!.idTextInput.text.toString(), signUpFragment!!.passwordTextInput.text.toString())
                 .addOnCompleteListener(requireActivity(), OnCompleteListener<AuthResult?> { task ->
                     if (task.isSuccessful) {
-                        database.child("user").push().setValue(User(signUpFragment!!.nameTextInput.text.toString(), signUpFragment!!.idTextInput.text.toString()))
+                        val key: String? = database.push().key
+                        database.child("user").child(key!!).setValue(User(signUpFragment!!.nameTextInput.text.toString(), signUpFragment!!.idTextInput.text.toString(), key))
                         val intent = Intent(requireContext(), MainActivity::class.java)
                         startActivity(intent)
                         val editor = sharedPreferences?.edit()

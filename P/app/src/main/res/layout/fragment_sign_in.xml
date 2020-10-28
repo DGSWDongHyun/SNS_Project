@@ -123,7 +123,7 @@
         app:layout_constraintVertical_bias="0.185" />
 
     <CheckBox
-        android:id="@+id/checkBox"
+        android:id="@+id/isCheckedAuto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="이 기기에서 계정을 기억합니다."
