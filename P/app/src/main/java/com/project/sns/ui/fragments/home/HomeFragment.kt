@@ -57,6 +57,7 @@ class HomeFragment : Fragment() {
        arrayAdapterGenre!!.setDropDownViewResource(R.layout.simple_spinner_dropdown_item)
         mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
 
+        readCategory()
         readBoard()
 
         getUserName()
@@ -75,7 +76,6 @@ class HomeFragment : Fragment() {
                         homeBinding!!.nameOfUser.text = user.userName
                         break
                     }else{
-                        homeBinding!!.nameOfUser.text = sharedPreference.getString("userName", "")
                     }
                 }
             }
@@ -88,7 +88,9 @@ class HomeFragment : Fragment() {
         when(requestCode){
             1 -> {
                 val dataObject = snapshot.getValue(Genre::class.java)
-                arrayAdapterGenre!!.add(dataObject!!.genre)
+                if(dataObject?.isVisible!!){
+                    arrayAdapterGenre!!.add(dataObject!!.genre)
+                }
             }
             2 -> {
                 val dataObject = snapshot.getValue(PostData::class.java)
@@ -123,6 +125,8 @@ class HomeFragment : Fragment() {
             }
 
         })
+
+        homeBinding?.spinner?.setAdapter(arrayAdapterGenre!!)
         //end
     }
 
@@ -156,10 +160,6 @@ class HomeFragment : Fragment() {
     }
 
     override fun onStart() {
-        readCategory()
-        homeBinding?.spinner?.setAdapter(arrayAdapterGenre!!)
-        homeBinding?.spinner?.setOnItemSelectedListener { view, position, id, item ->
-        }
         super.onStart()
     }
         override fun onStop() {

@@ -48,9 +48,12 @@ class SignInFragment : Fragment() {
         database = Firebase.database.reference
         sharedPreferences = requireContext().getSharedPreferences("Account", MODE_PRIVATE)
         registerBinding!!.isCheckedAuto.isChecked = sharedPreferences!!.getBoolean("isChecked", false)
+
         if(registerBinding!!.isCheckedAuto.isChecked){
+
             doLogin()
         }
+
         registerBinding!!.registerText.setTextColor(Color.BLUE)
         registerBinding!!.registerText.paintFlags = Paint.UNDERLINE_TEXT_FLAG
 
@@ -60,25 +63,32 @@ class SignInFragment : Fragment() {
 
         registerBinding!!.loginButton.setOnClickListener {
             if (registerBinding!!.idTextInput.text!!.isNotEmpty() && registerBinding!!.passwordTextInput.text!!.isNotEmpty()) {
-                requireActivity().finish()
+                doLogin()
             }
         }
     }
 
     override fun onDestroy() {
+        super.onDestroy()
         val editor = sharedPreferences!!.edit()
         if(sharedPreferences!!.getString("Email", "")!!.isEmpty() && sharedPreferences!!.getString("PassWord", "")!!.isEmpty()){
             editor?.putString("Email", registerBinding!!.idTextInput.text.toString())
             editor?.putString("PassWord", registerBinding!!.passwordTextInput.text.toString())
-            editor.putBoolean("isChecked", registerBinding!!.isCheckedAuto.isChecked)
-            editor.commit()
         }
-        super.onDestroy()
+        editor.putBoolean("isChecked", registerBinding!!.isCheckedAuto.isChecked)
+        editor.commit()
     }
     private fun doLogin() {
         if(registerBinding!!.isCheckedAuto.isChecked){
             if(sharedPreferences!!.getString("Email", "")!!.isNotEmpty() && sharedPreferences!!.getString("PassWord", "")!!.isNotEmpty()){
-                requireActivity().finish()
+                firebaseAuth.signInWithEmailAndPassword(sharedPreferences!!.getString("Email", "")!!, sharedPreferences!!.getString("PassWord", "")!!)
+                        .addOnCompleteListener(requireActivity(), OnCompleteListener<AuthResult?> { task ->
+                            if (task.isSuccessful) {
+                                requireActivity().finish()
+                            } else {
+                                Toast.makeText(requireContext(), "로그인 오류, 아이디나 비밀번호에 오류가 없는지 다시 확인하세요.", Toast.LENGTH_SHORT).show()
+                            }
+                        })
             }
         }else{
             firebaseAuth.signInWithEmailAndPassword(registerBinding!!.idTextInput.text.toString(), registerBinding!!.passwordTextInput.text.toString())
@@ -89,6 +99,6 @@ class SignInFragment : Fragment() {
                             Toast.makeText(requireContext(), "로그인 오류, 아이디나 비밀번호에 오류가 없는지 다시 확인하세요.", Toast.LENGTH_SHORT).show()
                         }
                     })
-        }
+         }
     }
 }
