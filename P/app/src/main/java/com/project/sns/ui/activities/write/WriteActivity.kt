@@ -1,25 +1,19 @@
 package com.project.sns.ui.activities.write
 
 import android.os.Bundle
-import android.util.Log
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.project.sns.R
-import com.project.sns.data.user.User
 import com.project.sns.data.write.PostData
 import com.project.sns.databinding.ActivityWriteBinding
 import com.project.sns.ui.viewmodel.MainViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
 class WriteActivity : AppCompatActivity() {
@@ -37,6 +31,15 @@ class WriteActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         database = Firebase.database.reference
 
+        writeBinding?.contentEditText!!.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable) {}
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                if(writeBinding?.titleEditText!!.text!!.isNotEmpty()){
+                    writeBinding?.fabWrite!!.visibility = View.VISIBLE
+                }
+            }
+        })
         writeBinding?.fabWrite!!.setOnClickListener {
             if(writeBinding!!.titleEditText.text!!.isNotEmpty() && writeBinding!!.contentEditText.text!!.isNotEmpty()) {
                 postData = PostData(writeBinding!!.titleEditText.text.toString(), writeBinding!!.contentEditText.text.toString(), null, System.currentTimeMillis(), "red", BOARD)

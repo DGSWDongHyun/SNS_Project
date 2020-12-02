@@ -1,25 +1,20 @@
 package com.project.sns.ui.adapters
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.database.ChildEventListener
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 import com.project.sns.R
 import com.project.sns.data.write.PostData
-import com.project.sns.ui.adapters.WriteAdapter.WriteViewHolder
 import com.project.sns.ui.adapters.listener.onClickItemListener
+import com.tapadoo.alerter.Alerter
+import com.tapadoo.alerter.OnHideAlertListener
+import com.tapadoo.alerter.OnShowAlertListener
 import java.text.SimpleDateFormat
 
 
@@ -41,10 +36,8 @@ class WriteAdapter(private val aContext: Context, private val listener: onClickI
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         var root : View ?= null
 
-
-
         when(viewType){
-            BOARD-> {
+            BOARD -> {
 
                 root = LayoutInflater.from(parent.context).inflate(R.layout.item_subjects, parent, false)
                 return WriteViewHolder(root!!)
@@ -76,7 +69,6 @@ class WriteAdapter(private val aContext: Context, private val listener: onClickI
 
         if(holder is WriteViewHolder){
             holder.title.text = title
-            holder.content?.text = content
             holder.dateTime.text = SimpleDateFormat("yyyy.MM.dd HH : mm").format(dateTime).toString()
 
             if (isStartViewCheck) {
@@ -108,8 +100,6 @@ class WriteAdapter(private val aContext: Context, private val listener: onClickI
 
     inner class WriteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val title: TextView = itemView.findViewById(R.id.title)
-        val content: TextView? = itemView.findViewById(R.id.content)
-        val imageView_uploaded: ImageView = itemView.findViewById(R.id.uploaded_image)
         val dateTime : TextView = itemView.findViewById(R.id.date_time)
         val view_animation: ConstraintLayout = itemView.findViewById(R.id.view_animation)
 

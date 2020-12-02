@@ -12,6 +12,9 @@
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 
+    <style name="TextTheme" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">#ffffff</item>
+    </style>
     <style name="Theme.MaterialEdit" parent="Theme.MaterialComponents">
 
     </style>

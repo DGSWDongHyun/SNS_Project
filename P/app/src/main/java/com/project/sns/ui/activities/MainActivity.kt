@@ -2,6 +2,7 @@ package com.project.sns.ui.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -19,6 +20,9 @@ import com.project.sns.databinding.FragmentHomeBinding
 import com.project.sns.ui.activities.splash.IntroActivity
 import com.project.sns.ui.activities.write.WriteActivity
 import com.project.sns.ui.viewmodel.MainViewModel
+import com.tapadoo.alerter.Alerter
+import com.tapadoo.alerter.OnHideAlertListener
+import com.tapadoo.alerter.OnShowAlertListener
 
 
 class MainActivity : AppCompatActivity() {
@@ -55,13 +59,64 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if(requestCode == REQUEST_POST){
-            if(resultCode == RESULT_OK){
-                Toast.makeText(applicationContext, "글쓰기가 성공적으로 이루어졌습니다.", Toast.LENGTH_LONG).show()
-            }else{
-                Toast.makeText(applicationContext, "글쓰기를 취소하셨습니다.", Toast.LENGTH_LONG).show()
-            }
+            showAlerter(resultCode)
         }
         super.onActivityResult(requestCode, resultCode, data)
+    }
+    private fun showAlerter(resultCode: Int) {
+        if(resultCode == RESULT_OK){
+            Alerter.create(this@MainActivity)
+                    .setTitle("띵동!")
+                    .setText("글쓰기가 완료되었습니다!")
+                    .setIcon(getDrawable(R.drawable.checked)!!)
+                    .setBackgroundColorRes(
+                            R.color.alerter_default_success_background)
+                    .setDuration(3000)
+                    .setTitleAppearance(R.style.TextTheme)
+                    .setTextAppearance(R.style.TextTheme)
+                    .setOnClickListener(
+                            View.OnClickListener {
+                                // do something when
+                                // Alerter message was clicked
+                            })
+                    .setOnShowListener(
+                            OnShowAlertListener {
+                                // do something when
+                                // Alerter message shows
+                            })
+                    .setOnHideListener(
+                            OnHideAlertListener {
+                                // do something when
+                                // Alerter message hides
+                            })
+                    .show()
+        }else{
+            Alerter.create(this@MainActivity)
+                    .setTitle("띵동!")
+                    .setText("글쓰기가 취소되었습니다!")
+                    .setIcon(getDrawable(R.drawable.checked)!!)
+                    .setBackgroundColorRes(
+                            R.color.design_default_color_error)
+                    .setDuration(3000)
+                    .setTitleAppearance(R.style.TextTheme)
+                    .setTextAppearance(R.style.TextTheme)
+                    .setOnClickListener(
+                            View.OnClickListener {
+                                // do something when
+                                // Alerter message was clicked
+                            })
+                    .setOnShowListener(
+                            OnShowAlertListener {
+                                // do something when
+                                // Alerter message shows
+                            })
+                    .setOnHideListener(
+                            OnHideAlertListener {
+                                // do something when
+                                // Alerter message hides
+                            })
+                    .show()
+        }
     }
     companion object{
         const val REQUEST_POST = 100

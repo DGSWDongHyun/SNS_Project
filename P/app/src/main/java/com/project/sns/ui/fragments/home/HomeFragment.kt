@@ -45,9 +45,10 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
         homeBinding?.fab!!.setOnClickListener {
-            val intent = Intent(requireContext(), WriteActivity::class.java)
-            startActivityForResult(intent, MainActivity.REQUEST_POST)
+            val intent = Intent(requireActivity(), WriteActivity::class.java)
+            requireActivity().startActivityForResult(intent, MainActivity.REQUEST_POST)
             requireActivity().overridePendingTransition(com.project.sns.R.anim.visible, com.project.sns.R.anim.invisible);
         }
 
@@ -60,28 +61,8 @@ class HomeFragment : Fragment() {
         readCategory()
         readBoard()
 
-        getUserName()
         homeBinding!!.recyclerSubject.adapter = writeAdapter
         homeBinding!!.recyclerSubject.layoutManager = LinearLayoutManager(context)
-    }
-    private fun getUserName() {
-        val sharedPreference : SharedPreferences = requireContext().getSharedPreferences("Account",MODE_PRIVATE)
-        database.child("user").addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                for (snapshot in dataSnapshot.children) {
-                    val user = snapshot.getValue(User::class.java)
-                    Log.d("s",sharedPreference.getString("Email", null).equals(user!!.userEmail).toString())
-                    Log.d("s", "${sharedPreference.getString("Email", null)} : ${user!!.userEmail}")
-                    if(sharedPreference.getString("Email", null).equals(user!!.userEmail)){
-                        homeBinding!!.nameOfUser.text = user.userName
-                        break
-                    }else{
-                    }
-                }
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {}
-        })
     }
     fun dataClear(snapshot: DataSnapshot, requestCode: Int){
 
@@ -126,11 +107,10 @@ class HomeFragment : Fragment() {
 
         })
 
-        homeBinding?.spinner?.setAdapter(arrayAdapterGenre!!)
         //end
     }
 
-    fun readBoard() {
+    private fun readBoard() {
         // read bbs db
         database.child("board").child("path").addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {

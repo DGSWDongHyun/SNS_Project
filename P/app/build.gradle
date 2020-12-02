@@ -58,6 +58,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:19.4.0'
     implementation"android.arch.navigation:navigation-fragment-ktx:2.3.0"
     implementation "android.arch.navigation:navigation-ui-ktx:2.3.0"
+    implementation 'com.tapadoo.android:alerter:2.0.4'
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
 
 }
 repositories {
