@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_image"
+        android:icon="@drawable/ic_baseline_image_24"
+        android:title="" />
+
+    <item
+        android:id="@+id/navigation_link"
+        android:icon="@drawable/ic_baseline_link_24"
+        android:title="" />
+
+    <item
+        android:id="@+id/navigation_emoticon"
+        android:icon="@drawable/ic_baseline_emoji_emotions_24"
+        android:title="" />
+
+</menu>

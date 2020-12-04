@@ -19,7 +19,8 @@
             android:exported="true" />
 
         <activity android:name=".ui.activities.splash.IntroActivity" />
-        <activity android:name=".ui.activities.write.WriteActivity" />
+        <activity android:name=".ui.activities.write.WriteActivity"
+                  android:windowSoftInputMode="adjustPan" />
         <activity android:name=".ui.activities.register.RegisterActivity" />
         <activity
             android:name=".ui.activities.MainActivity"

@@ -1,6 +1,8 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'com.google.gms.google-services'
+apply plugin: 'kotlin-kapt'
+
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.2"
@@ -60,7 +62,13 @@ dependencies {
     implementation "android.arch.navigation:navigation-ui-ktx:2.3.0"
     implementation 'com.tapadoo.android:alerter:2.0.4'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
-
+    implementation platform('com.google.firebase:firebase-bom:26.1.0')
+    implementation 'com.google.firebase:firebase-storage'
+    implementation 'com.github.bumptech.glide:glide:4.11.0'
+    kapt 'com.github.bumptech.glide:compiler:4.11.0'
+    implementation 'com.firebaseui:firebase-ui-storage:6.4.0'
+    implementation 'com.google.android.gms:play-services-basement:17.5.0'
+    implementation 'com.google.firebase:firebase-analytics:18.0.0'
 }
 repositories {
     mavenCentral()

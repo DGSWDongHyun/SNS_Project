@@ -3,6 +3,7 @@ package com.project.sns.ui.activities.splash
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.view.Window
 import androidx.appcompat.app.AppCompatActivity
 import com.project.sns.R
 import com.project.sns.ui.activities.register.RegisterActivity

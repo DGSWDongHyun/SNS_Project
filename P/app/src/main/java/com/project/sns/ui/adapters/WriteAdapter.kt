@@ -1,14 +1,21 @@
 package com.project.sns.ui.adapters
 
 import android.content.Context
+import android.media.Image
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
+import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import com.project.sns.GlideApp
 import com.project.sns.R
 import com.project.sns.data.write.PostData
 import com.project.sns.ui.adapters.listener.onClickItemListener
@@ -70,6 +77,7 @@ class WriteAdapter(private val aContext: Context, private val listener: onClickI
         if(holder is WriteViewHolder){
             holder.title.text = title
             holder.dateTime.text = SimpleDateFormat("yyyy.MM.dd HH : mm").format(dateTime).toString()
+            holder.commentCount.text = postData!![position].commentCount.toString()
 
             if (isStartViewCheck) {
                 if (position > 6) isStartViewCheck = false
@@ -81,9 +89,24 @@ class WriteAdapter(private val aContext: Context, private val listener: onClickI
                 }
             }
 
-            if (image_url != null) {
+            if (!image_url.isNullOrEmpty()) {
+                holder.imagePreview.visibility = View.VISIBLE
+                val storage : FirebaseStorage?= FirebaseStorage.getInstance()
+                val storageRef: StorageReference = storage!!.reference.child("$image_url")
+                storageRef.downloadUrl.addOnCompleteListener {
+                    if(it.isSuccessful){
+                        GlideApp.with(aContext)
+                                .load(storageRef)
+                                .centerCrop()
+                                .into(holder.imagePreviews)
+                    }else{
+                        Toast.makeText(aContext, "이미지 로딩에 실패하였습니다.", Toast.LENGTH_LONG).show()
+                    }
+                }
+            }else{
+                holder.imagePreview.visibility = View.GONE
             }
-            holder.itemView.setOnClickListener { v: View? -> listener.onClickItem(position) }
+            holder.itemView.setOnClickListener { v: View? -> listener.onClickItem(position, postData) }
             positionCheck = position
         }else if(holder is RefreshViewHolder){
         }
@@ -102,6 +125,9 @@ class WriteAdapter(private val aContext: Context, private val listener: onClickI
         val title: TextView = itemView.findViewById(R.id.title)
         val dateTime : TextView = itemView.findViewById(R.id.date_time)
         val view_animation: ConstraintLayout = itemView.findViewById(R.id.view_animation)
+        val commentCount : TextView = itemView.findViewById(R.id.commentText)
+        val imagePreview : CardView = itemView.findViewById(R.id.cardImage)
+        val imagePreviews : ImageView = itemView.findViewById(R.id.image_preview)
 
     }
 
