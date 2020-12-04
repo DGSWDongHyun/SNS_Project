@@ -1,3 +1,5 @@
 package com.project.sns.data.comment
 
-data class Comment(var commentName : String?= null, var commentContent : String?= null, var commentDateTime : Long?= null)
+import com.project.sns.data.user.User
+
+data class Comment(var commentContent : String?= null, var commentDateTime : Long?= null, var user : User?= null)

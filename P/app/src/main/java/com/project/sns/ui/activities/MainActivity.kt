@@ -27,6 +27,7 @@ import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import com.project.sns.GlideApp
 import com.project.sns.R
+import com.project.sns.data.user.User
 import com.project.sns.data.write.PostData
 import com.project.sns.databinding.ActivityMainBinding
 import com.project.sns.databinding.FragmentHomeBinding
@@ -86,17 +87,21 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode != RESULT_OK) {
+            return
+        }
         when (requestCode) {
             REQUEST_POST -> {
                 showAlerter(resultCode)
             }
-            WriteActivity.FROM_ALBUM -> {
+            FROM_ALBUM -> {
                 if (data?.data != null) {
                     try {
                         val photoURI = data.data
                         mainViewModel?.data?.value = data.data
+
                         GlideApp.with(this).load(photoURI).into(mainViewModel?.fragmentViewProfile?.value?.imageProfile!!)
-                        makeConfirmDialog(mainViewModel?.data?.value, WriteActivity.FROM_ALBUM)
+                        makeConfirmDialog(mainViewModel?.data?.value, FROM_ALBUM)
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
@@ -111,8 +116,8 @@ class MainActivity : AppCompatActivity() {
         val storageRef: StorageReference = storage!!.reference.child("profiles/$filename")
         val uploadTask: UploadTask
         var file: Uri? = null
-        if (flag == WriteActivity.TAKE_PHOTO) {
-        } else if (flag == WriteActivity.FROM_ALBUM) {
+
+        if (flag == WriteActivity.FROM_ALBUM) {
             file = data
         }
         uploadTask = storageRef.putFile(file!!)
@@ -123,7 +128,10 @@ class MainActivity : AppCompatActivity() {
         uploadTask.addOnFailureListener(OnFailureListener {
             exception ->  exception.printStackTrace()
         }).addOnSuccessListener(OnSuccessListener<Any> { taskSnapshot ->
-
+            progressDialog.dismiss()
+            database.child("user").child(mainViewModel?.key?.value!!)
+                    .setValue(User(mainViewModel?.userAccount?.value?.userName, mainViewModel?.userAccount?.value?.userEmail,
+                            mainViewModel?.userAccount?.value?.key , "profiles/$filename"))
         })
     }
     private fun showAlerter(resultCode: Int) {
@@ -181,5 +189,6 @@ class MainActivity : AppCompatActivity() {
     }
     companion object{
         const val REQUEST_POST = 100
+        const val FROM_ALBUM = 2
     }
 }

@@ -83,7 +83,7 @@ open class ProfileFragment : Fragment() {
         val intent = Intent(Intent.ACTION_PICK)
         intent.type = MediaStore.Images.Media.CONTENT_TYPE
         intent.type = "image/*"
-        startActivityForResult(intent, WriteActivity.FROM_ALBUM)
+        requireActivity().startActivityForResult(intent, FROM_ALBUM)
     }
 
 
@@ -99,6 +99,10 @@ open class ProfileFragment : Fragment() {
                         profileBinding!!.name.text = user.userName + "님의 최근 공부 시간입니다."
                         profileBinding!!.nameText.text = "이름 : " + user.userName
                         key = user.key
+                        val storage : FirebaseStorage?= FirebaseStorage.getInstance()
+                        val storageRef: StorageReference = storage!!.reference.child("${user.userProfile}")
+                        GlideApp.with(requireActivity()).load(storageRef).into(profileBinding?.imageProfile!!)
+                        mainViewModel?.userAccount?.value = user
                         break
                     }
                 }
@@ -123,5 +127,8 @@ open class ProfileFragment : Fragment() {
         val d = PieData(ds1)
 
         return d
+    }
+    companion object{
+        const val FROM_ALBUM = 2
     }
 }

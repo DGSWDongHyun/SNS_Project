@@ -9,10 +9,14 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import com.project.sns.GlideApp
 import com.project.sns.R
 import com.project.sns.data.comment.Comment
 import com.project.sns.data.write.PostData
 import com.project.sns.ui.adapters.listener.onClickItemListener
+import de.hdodenhof.circleimageview.CircleImageView
 import java.text.SimpleDateFormat
 
 class CommentAdapter(private val aContext: Context) : RecyclerView.Adapter<RecyclerView.ViewHolder?>() {
@@ -37,13 +41,18 @@ class CommentAdapter(private val aContext: Context) : RecyclerView.Adapter<Recyc
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val (commentName, commentContent, commentDateTime) = commentData!![position]
+        val (commentContent, commentDateTime, user) = commentData!![position]
 
         if(holder is CommentViewHolder){
 
-            holder.title.text = commentName
+            val storage : FirebaseStorage?= FirebaseStorage.getInstance()
+            val storageRef: StorageReference = storage!!.reference.child("${user?.userProfile}")
+            GlideApp.with(holder.itemView).load(storageRef).into(holder.profile)
+
+            holder.title.text = user?.userName
             holder.commentContent.text = commentContent
             holder.dateTime.text = SimpleDateFormat("yyyy.MM.dd HH : mm").format(commentDateTime).toString()
+
 
             if (isStartViewCheck) {
                 if (position > 6) isStartViewCheck = false
@@ -64,6 +73,7 @@ class CommentAdapter(private val aContext: Context) : RecyclerView.Adapter<Recyc
     }
 
     inner class CommentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val profile : CircleImageView = itemView.findViewById(R.id.profile_image)
         val title: TextView = itemView.findViewById(R.id.textTitle)
         val dateTime : TextView = itemView.findViewById(R.id.textDateTime)
         val view_animation: ConstraintLayout = itemView.findViewById(R.id.view_animation)

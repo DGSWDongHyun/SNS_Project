@@ -1,5 +1,7 @@
 package com.project.sns.ui.activities
 
+import android.content.Context
+import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -14,6 +16,7 @@ import com.google.firebase.storage.StorageReference
 import com.project.sns.GlideApp
 import com.project.sns.R
 import com.project.sns.data.comment.Comment
+import com.project.sns.data.user.User
 import com.project.sns.data.write.PostData
 import com.project.sns.databinding.ActivityReadBinding
 import com.project.sns.ui.adapters.CommentAdapter
@@ -21,6 +24,7 @@ import com.project.sns.ui.adapters.CommentAdapter
 class ReadActivity : AppCompatActivity() {
     var readBinding : ActivityReadBinding ?= null
     var commentList : ArrayList<Comment> = arrayListOf()
+    var userMember : User ?= null
     private var commentAdapter : CommentAdapter ?= null
 
     private lateinit var database: DatabaseReference
@@ -36,10 +40,10 @@ class ReadActivity : AppCompatActivity() {
 
         readBinding?.postTitle?.text = intent.getStringExtra("title")
         readBinding?.contentTextView?.text = intent.getStringExtra("content")
-        readBinding?.detailTextView?.text = "${intent.getStringExtra("genre")} - ${intent.getStringExtra("userName")}"
 
         var commentCount = intent.getIntExtra("commentCount", 0)
         readComment()
+        getImage()
 
         if(!intent.getStringExtra("image").isNullOrEmpty()){
             Log.d("hasExtra", intent.getStringExtra("image")!!)
@@ -51,7 +55,6 @@ class ReadActivity : AppCompatActivity() {
                     GlideApp.with(this)
                         .load (storageRef)
                         .into (readBinding?.loadedImage!!)
-
                 }else{
                     Toast.makeText(applicationContext, "이미지 로딩에 실패하였습니다.", Toast.LENGTH_LONG).show()
                 }
@@ -65,7 +68,7 @@ class ReadActivity : AppCompatActivity() {
         readBinding?.sendComment?.setOnClickListener {
             database.child("board").child("path")
                     .child(intent.getStringExtra("key").toString()).child("commentList").push()
-                    .setValue(Comment("name", readBinding?.commentEditText?.text.toString(), System.currentTimeMillis()))
+                    .setValue(Comment(readBinding?.commentEditText?.text.toString(), System.currentTimeMillis(), userMember))
 
             commentCount ++
             database.child("board").child("path")
@@ -76,27 +79,47 @@ class ReadActivity : AppCompatActivity() {
 
         }
     }
+
+    private fun getImage() {
+        val sharedPreference : SharedPreferences = getSharedPreferences("Account", Context.MODE_PRIVATE)
+        database.child("user").addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                for (snapshot in dataSnapshot.children) {
+                    val user = snapshot.getValue(User::class.java)
+                    if (sharedPreference.getString("Email", null).equals(user!!.userEmail)) {
+                        userMember = user
+                        val storage : FirebaseStorage?= FirebaseStorage.getInstance()
+                        val storageRef: StorageReference = storage!!.reference.child("${user.userProfile}")
+                        GlideApp.with(this@ReadActivity).load(storageRef).into(readBinding?.profileImage!!)
+                        readBinding?.detailTextView?.text = "${intent.getStringExtra("genre")} - ${user.userName}"
+                        break
+                    }
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {}
+        })
+    }
+
     private fun readComment(){
         database.child("board").child("path").child(intent.getStringExtra("key").toString()).child("commentList").addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                 val dataObject = snapshot.getValue(Comment::class.java)
                 if(dataObject != null){
-                    commentList.add(0, Comment(dataObject.commentName, dataObject.commentContent, dataObject.commentDateTime))
+                    commentList.add(0, Comment(dataObject.commentContent, dataObject.commentDateTime, dataObject.user))
                     commentAdapter?.setData(commentList)
                 }
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                commentList.clear()
                 val dataObject = snapshot.getValue(Comment::class.java)
-                commentList.add(0, Comment(dataObject!!.commentName, dataObject.commentContent, dataObject.commentDateTime))
+                commentList.add(0, Comment(dataObject?.commentContent, dataObject?.commentDateTime, dataObject?.user))
                 commentAdapter?.setData(commentList)
             }
 
             override fun onChildRemoved(snapshot: DataSnapshot) {
-                commentList.clear()
                 val dataObject = snapshot.getValue(Comment::class.java)
-                commentList.add(0, Comment(dataObject!!.commentName, dataObject.commentContent, dataObject.commentDateTime))
+                commentList.add(0, Comment(dataObject?.commentContent, dataObject?.commentDateTime, dataObject?.user))
                 commentAdapter?.setData(commentList)
 
             }

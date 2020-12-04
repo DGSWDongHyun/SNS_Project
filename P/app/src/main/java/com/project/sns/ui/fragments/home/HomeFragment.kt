@@ -18,6 +18,9 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import com.project.sns.GlideApp
 import com.project.sns.data.category.Genre
 import com.project.sns.data.write.PostData
 import com.project.sns.databinding.FragmentHomeBinding
@@ -52,8 +55,6 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val headerView: View = homeBinding?.navView?.getHeaderView(0)!!
-        val drawerImage: ImageView = headerView.findViewById(com.project.sns.R.id.imageHeader) as ImageView
-        drawerImage.setImageResource(R.drawable.ic_delete)
 
         homeBinding?.toolbar?.title = "전체 과목"
         homeBinding?.toolbar?.setTitleTextColor(requireContext().getColor(R.color.white))
@@ -116,12 +117,10 @@ class HomeFragment : Fragment() {
                 }
             }
             2 -> {
-                if (snapshot.exists()) {
                     val dataObject = snapshot.getValue(PostData::class.java)
                     postDataList!!.add(0, PostData(dataObject!!.title, dataObject.content, dataObject.image_url,
                             dataObject.dateTime, dataObject.genre, dataObject.viewType, dataObject.UserName, dataObject.commentCount,
                             dataObject.commentList, dataObject.key))
-                }
             }
         }
 
@@ -137,13 +136,11 @@ class HomeFragment : Fragment() {
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                subMenu?.clear()
                 dataClear(snapshot, 1)
 
             }
 
             override fun onChildRemoved(snapshot: DataSnapshot) {
-                subMenu?.clear()
                 dataClear(snapshot, 1)
             }
 
@@ -169,7 +166,6 @@ class HomeFragment : Fragment() {
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                postDataList!!.clear()
                 dataClear(snapshot, 2)
                 writeAdapter!!.setData(postDataList)
             }

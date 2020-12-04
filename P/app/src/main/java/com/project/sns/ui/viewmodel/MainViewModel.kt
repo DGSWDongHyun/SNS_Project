@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData
 
 import androidx.lifecycle.ViewModel
 import com.github.mikephil.charting.data.PieEntry
+import com.project.sns.data.user.User
 import com.project.sns.data.write.PostData
 import com.project.sns.databinding.FragmentHomeBinding
 import com.project.sns.databinding.FragmentProfileBinding
@@ -21,4 +22,5 @@ class MainViewModel : ViewModel() {
     var fragmentViewProfile : MutableLiveData<FragmentProfileBinding> = MutableLiveData()
     var key : MutableLiveData<String> = MutableLiveData()
     var data : MutableLiveData<Uri> = MutableLiveData()
+    var userAccount : MutableLiveData<User> = MutableLiveData()
 }
