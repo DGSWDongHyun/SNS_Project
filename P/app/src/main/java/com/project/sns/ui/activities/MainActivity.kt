@@ -1,6 +1,8 @@
 package com.project.sns.ui.activities
 
+import android.app.AlertDialog
 import android.app.ProgressDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -59,7 +61,7 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                mainViewModel?.fragmentView?.value?.drawerLayout?.openDrawer(Gravity.START)
+                mainViewModel?.fragmentView?.value?.drawerLayout?.openDrawer(GravityCompat.START)
                 true
             }
             else -> {
@@ -109,6 +111,19 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    override fun onBackPressed() {
+        val alertDialog = AlertDialog.Builder(this)
+                .setTitle("종료하시겠습니까?")
+                .setPositiveButton("종료") { dialogInterface: DialogInterface, i: Int ->
+                    finish()
+                }.setNegativeButton("취소") { dialogInterface: DialogInterface, i: Int ->
+
+                }
+
+        alertDialog.create().show()
+    }
+
     private fun makeConfirmDialog(data: Uri?, flag: Int) {
 
         val filename = "uploaded" + "_" + System.currentTimeMillis()

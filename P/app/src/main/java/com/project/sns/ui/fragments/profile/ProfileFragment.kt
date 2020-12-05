@@ -13,8 +13,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
@@ -22,19 +24,20 @@ import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import com.project.sns.GlideApp
+import com.project.sns.R
 import com.project.sns.data.user.User
+import com.project.sns.data.write.PostData
 import com.project.sns.databinding.FragmentProfileBinding
+import com.project.sns.ui.activities.ReadActivity
 import com.project.sns.ui.activities.write.WriteActivity
+import com.project.sns.ui.adapters.WriteAdapter
 import com.project.sns.ui.viewmodel.MainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -47,6 +50,9 @@ open class ProfileFragment : Fragment() {
     private var mainViewModel : MainViewModel?= null
     var profileBinding : FragmentProfileBinding ?= null
     var key : String ?= ""
+    var users : User ?= null
+    private var writeAdapter: WriteAdapter? = null
+    private var postDataList: ArrayList<PostData> ?= ArrayList()
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -61,16 +67,24 @@ open class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        profileBinding!!.chart1.description.isEnabled = false
-
-        profileBinding!!.chart1.setCenterTextSize(10f)
-
-        profileBinding!!.chart1.holeRadius = 45f
-        profileBinding!!.chart1.transparentCircleRadius = 50f
-
-        profileBinding!!.chart1.data = generatePieData()
-
         getUserName()
+
+
+        writeAdapter = WriteAdapter(requireContext()) { position: Int, listPostData: List<PostData> ->
+            val intent = Intent(requireActivity(), ReadActivity::class.java)
+            intent.putExtra("title", listPostData[position].title)
+            intent.putExtra("content", listPostData[position].content)
+            intent.putExtra("genre", listPostData[position].genre)
+            intent.putExtra("key", listPostData[position].key)
+            intent.putExtra("commentCount", listPostData[position].commentCount)
+            intent.putExtra("image", listPostData[position].image_url)
+            intent.putExtra("userName", listPostData[position].UserName)
+            startActivity(intent)
+            requireActivity().overridePendingTransition(R.anim.pull_anim, R.anim.invisible);
+        }
+
+        profileBinding?.recyclerView?.layoutManager = LinearLayoutManager(requireContext())
+        profileBinding?.recyclerView?.adapter = writeAdapter
 
         profileBinding?.imageProfile?.setOnClickListener {
             selectAlbum()
@@ -86,7 +100,55 @@ open class ProfileFragment : Fragment() {
         requireActivity().startActivityForResult(intent, FROM_ALBUM)
     }
 
+    private fun findBoard(name : String){
+        // read bbs db
+        postDataList?.clear()
 
+        database.child("board").child("path").addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                val dataObject = snapshot.getValue(PostData::class.java)
+                if(name == dataObject?.UserName){
+                    postDataList!!.add(0, PostData(dataObject!!.title, dataObject.content, dataObject.image_url,
+                            dataObject.dateTime, dataObject.genre, dataObject.viewType, dataObject.UserName, dataObject.commentCount,
+                            dataObject.commentList, dataObject.key))
+                }
+
+                writeAdapter!!.setData(postDataList)
+            }
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                postDataList?.clear()
+                val dataObject = snapshot.getValue(PostData::class.java)
+                if(name == dataObject?.UserName){
+                    postDataList!!.add(0, PostData(dataObject!!.title, dataObject.content, dataObject.image_url,
+                            dataObject.dateTime, dataObject.genre, dataObject.viewType, dataObject.UserName, dataObject.commentCount,
+                            dataObject.commentList, dataObject.key))
+                }
+                writeAdapter!!.setData(postDataList)
+            }
+
+            override fun onChildRemoved(snapshot: DataSnapshot) {
+                postDataList?.clear()
+                val dataObject = snapshot.getValue(PostData::class.java)
+                if(name == dataObject?.UserName){
+                    postDataList!!.add(0, PostData(dataObject!!.title, dataObject.content, dataObject.image_url,
+                            dataObject.dateTime, dataObject.genre, dataObject.viewType, dataObject.UserName, dataObject.commentCount,
+                            dataObject.commentList, dataObject.key))
+                }
+                writeAdapter!!.setData(postDataList)
+            }
+
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.e("Error", databaseError.message)
+            }
+        })
+
+        //end
+    }
     private fun getUserName() {
         val sharedPreference : SharedPreferences = requireContext().getSharedPreferences("Account", Context.MODE_PRIVATE)
         database.child("user").addListenerForSingleValueEvent(object : ValueEventListener {
@@ -96,13 +158,15 @@ open class ProfileFragment : Fragment() {
                     Log.d("s", sharedPreference.getString("Email", null).equals(user!!.userEmail).toString())
                     Log.d("s", "${sharedPreference.getString("Email", null)} : ${user!!.userEmail}")
                     if (sharedPreference.getString("Email", null).equals(user!!.userEmail)) {
-                        profileBinding!!.name.text = user.userName + "님의 최근 공부 시간입니다."
-                        profileBinding!!.nameText.text = "이름 : " + user.userName
+                        profileBinding!!.nameText.text = user.userName
+                        profileBinding!!.emailText?.text = user.userEmail
                         key = user.key
+                        users = user
                         val storage : FirebaseStorage?= FirebaseStorage.getInstance()
                         val storageRef: StorageReference = storage!!.reference.child("${user.userProfile}")
                         GlideApp.with(requireActivity()).load(storageRef).into(profileBinding?.imageProfile!!)
                         mainViewModel?.userAccount?.value = user
+                        findBoard(users?.userName!!)
                         break
                     }
                 }
@@ -112,22 +176,6 @@ open class ProfileFragment : Fragment() {
         })
     }
 
-    private fun generatePieData(): PieData? {
-        val count = 2
-        val value : Float = 50F
-        val entries1: ArrayList<PieEntry> = ArrayList()
-        for (i in 0 until count) {
-            entries1.add(PieEntry(value, "과목 " + (i + 1)))
-        }
-        val ds1 = PieDataSet(entries1, "최근 공부 시간")
-        ds1.setColors(*ColorTemplate.VORDIPLOM_COLORS)
-        ds1.sliceSpace = 2f
-        ds1.valueTextColor = Color.WHITE
-        ds1.valueTextSize = 12f
-        val d = PieData(ds1)
-
-        return d
-    }
     companion object{
         const val FROM_ALBUM = 2
     }
