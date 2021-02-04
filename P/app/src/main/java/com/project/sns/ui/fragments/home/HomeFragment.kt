@@ -81,7 +81,7 @@ class HomeFragment : Fragment() {
             requireActivity().overridePendingTransition(com.project.sns.R.anim.visible, com.project.sns.R.anim.invisible);
         }
 
-        writeAdapter = WriteAdapter(requireContext()) { position: Int, listPostData: List<PostData> ->
+        writeAdapter = WriteAdapter(requireContext()) { position: Int, listPostData: List<PostData> -> 
             val intent = Intent(requireActivity(), ReadActivity::class.java)
             intent.putExtra("title", listPostData[position].title)
             intent.putExtra("content", listPostData[position].content)

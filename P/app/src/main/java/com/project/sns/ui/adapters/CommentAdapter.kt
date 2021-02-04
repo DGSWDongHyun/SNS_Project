@@ -47,11 +47,9 @@ class CommentAdapter(private val aContext: Context) : RecyclerView.Adapter<Recyc
 
             val storage : FirebaseStorage?= FirebaseStorage.getInstance()
             val storageRef: StorageReference = storage!!.reference.child("${user?.userProfile}")
-            if(user?.userProfile == null){
-                GlideApp.with(holder.itemView).load(aContext.getDrawable(R.drawable.ic_baseline_account_circle_24)).into(holder.profile)
-            }else{
-                GlideApp.with(holder.itemView).load(storageRef).into(holder.profile)
-            }
+
+            GlideApp.with(holder.itemView).load(storageRef).into(holder.profile)
+
 
             holder.title.text = user?.userName
             holder.commentContent.text = commentContent
