@@ -1,7 +1,6 @@
 package com.project.sns.ui.adapters
 
 import android.content.Context
-import android.media.Image
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,9 +18,6 @@ import com.project.sns.GlideApp
 import com.project.sns.R
 import com.project.sns.data.write.PostData
 import com.project.sns.ui.adapters.listener.onClickItemListener
-import com.tapadoo.alerter.Alerter
-import com.tapadoo.alerter.OnHideAlertListener
-import com.tapadoo.alerter.OnShowAlertListener
 import java.text.SimpleDateFormat
 
 
