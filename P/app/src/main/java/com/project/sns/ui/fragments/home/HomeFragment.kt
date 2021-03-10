@@ -55,16 +55,21 @@ class HomeFragment : Fragment() {
         val sharedPreferences = requireContext().getSharedPreferences("Account", Context.MODE_PRIVATE)
         database = Firebase.database.reference
 
+            initLayout(sharedPreferences)
+            initRecyclerViews()
+        }
+
+    private fun initLayout(sharedPreferences : SharedPreferences) {
         val headerView: View = homeBinding?.navView?.getHeaderView(0)!!
         val nameText = headerView.findViewById<TextView>(com.project.sns.R.id.name)
         val emailText = headerView.findViewById<TextView>(com.project.sns.R.id.email)
 
         getUserName(nameText)
         emailText.text = sharedPreferences.getString("Email", "")
-        
+
         homeBinding?.toolbar?.setTitleTextColor(requireContext().getColor(R.color.white))
         (activity as AppCompatActivity?)!!.setSupportActionBar(homeBinding?.toolbar)
-        
+
         (activity as AppCompatActivity?)!!.supportActionBar?.title = "전체 과목"
         (activity as AppCompatActivity?)!!.supportActionBar?.setDisplayHomeAsUpEnabled(true)
         (activity as AppCompatActivity?)!!.supportActionBar?.setHomeButtonEnabled(true)
@@ -81,27 +86,7 @@ class HomeFragment : Fragment() {
             requireActivity().overridePendingTransition(com.project.sns.R.anim.visible, com.project.sns.R.anim.invisible);
         }
 
-        writeAdapter = WriteAdapter(requireContext()) { position: Int, listPostData: List<PostData> -> 
-            val intent = Intent(requireActivity(), ReadActivity::class.java)
-            intent.putExtra("title", listPostData[position].title)
-            intent.putExtra("content", listPostData[position].content)
-            intent.putExtra("genre", listPostData[position].genre)
-            intent.putExtra("key", listPostData[position].key)
-            intent.putExtra("commentCount", listPostData[position].commentCount)
-            intent.putExtra("image", listPostData[position].image_url)
-            intent.putExtra("userName", listPostData[position].UserName)
-            startActivity(intent)
-            requireActivity().overridePendingTransition(com.project.sns.R.anim.pull_anim, com.project.sns.R.anim.invisible);
-        }
 
-       arrayAdapterGenre = ArrayAdapter<String>(requireContext(), R.layout.simple_spinner_dropdown_item)
-       arrayAdapterGenre!!.setDropDownViewResource(R.layout.simple_spinner_dropdown_item)
-
-        readCategory()
-        readBoard()
-
-        homeBinding!!.recyclerSubject.adapter = writeAdapter
-        homeBinding!!.recyclerSubject.layoutManager = LinearLayoutManager(context)
 
         homeBinding!!.navView.setNavigationItemSelectedListener {
 
@@ -113,8 +98,33 @@ class HomeFragment : Fragment() {
             homeBinding!!.drawerLayout.closeDrawers();
 
             return@setNavigationItemSelectedListener true
-            }
         }
+    }
+    private fun initRecyclerViews() {
+        writeAdapter = WriteAdapter(requireContext()) { position: Int, listPostData: List<PostData> ->
+            val intent = Intent(requireActivity(), ReadActivity::class.java)
+            intent.putExtra("title", listPostData[position].title)
+            intent.putExtra("content", listPostData[position].content)
+            intent.putExtra("genre", listPostData[position].genre)
+            intent.putExtra("key", listPostData[position].key)
+            intent.putExtra("commentCount", listPostData[position].commentCount)
+            intent.putExtra("image", listPostData[position].image_url)
+            intent.putExtra("userName", listPostData[position].UserName)
+            startActivity(intent)
+            requireActivity().overridePendingTransition(com.project.sns.R.anim.pull_anim, com.project.sns.R.anim.invisible);
+
+            arrayAdapterGenre = ArrayAdapter<String>(requireContext(), R.layout.simple_spinner_dropdown_item)
+            arrayAdapterGenre!!.setDropDownViewResource(R.layout.simple_spinner_dropdown_item)
+
+            readCategory()
+            readBoard()
+
+            homeBinding!!.recyclerSubject.adapter = writeAdapter
+            homeBinding!!.recyclerSubject.layoutManager = LinearLayoutManager(context)
+        }
+    }
+
+
 
     private fun getUserName(nameText: TextView) {
         val sharedPreference : SharedPreferences = requireContext().getSharedPreferences("Account", Context.MODE_PRIVATE)

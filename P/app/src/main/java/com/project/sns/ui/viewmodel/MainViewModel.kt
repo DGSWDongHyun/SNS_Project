@@ -16,7 +16,6 @@ import com.project.sns.ui.adapters.WriteAdapter
 
 
 class MainViewModel : ViewModel() {
-    var chartData : MutableLiveData<PieEntry> = MutableLiveData()
     val liveAdapter : MutableLiveData<WriteAdapter> = MutableLiveData()
     var fragmentView : MutableLiveData<FragmentHomeBinding> = MutableLiveData()
     var fragmentViewProfile : MutableLiveData<FragmentProfileBinding> = MutableLiveData()
