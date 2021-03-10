@@ -125,7 +125,7 @@
                 android:layout_height="match_parent">
 
                 <Button
-                    android:id="@+id/imageButton"
+                    android:id="@+id/selectImage"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_marginStart="5dp"
@@ -138,7 +138,7 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <Button
-                    android:id="@+id/linkButton"
+                    android:id="@+id/selectFile"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_marginStart="10dp"
@@ -147,7 +147,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toEndOf="@+id/imageButton"
+                    app:layout_constraintStart_toEndOf="@+id/selectImage"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintVertical_bias="0.6" />
 
@@ -163,7 +163,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toEndOf="@+id/linkButton"
+                    app:layout_constraintStart_toEndOf="@+id/selectFile"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView

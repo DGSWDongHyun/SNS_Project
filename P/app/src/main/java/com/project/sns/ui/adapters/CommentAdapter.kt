@@ -25,6 +25,7 @@ class CommentAdapter(private val aContext: Context) : RecyclerView.Adapter<Recyc
     private var commentData: List<Comment>? = null
 
     fun setData(commentData : ArrayList<Comment>?) {
+
         this.commentData = commentData
         notifyDataSetChanged()
     }

@@ -21,6 +21,8 @@ import com.project.sns.GlideApp
 import com.project.sns.R
 import com.project.sns.data.board.PostData
 import com.project.sns.data.board.User
+import com.project.sns.data.module.FirebaseDatabaseModule
+import com.project.sns.data.module.SimpleIntentModule
 import com.project.sns.databinding.FragmentProfileBinding
 import com.project.sns.ui.activities.write.ReadActivity
 import com.project.sns.ui.adapters.WriteAdapter
@@ -55,17 +57,7 @@ open class ProfileFragment : Fragment() {
 
         writeAdapter = WriteAdapter(requireContext(), object : onClickItemListener {
             override fun onClickItem(position: Int, postData: ArrayList<PostData>) {
-                val intent = Intent(requireActivity(), ReadActivity::class.java)
-                intent.putExtra("title", postData[position].title)
-                intent.putExtra("content", postData[position].content)
-                intent.putExtra("genre", postData[position].genre)
-                intent.putExtra("key", postData[position].key)
-                intent.putExtra("commentCount", postData[position].commentCount)
-                intent.putExtra("image", postData[position].image_url)
-                intent.putExtra("userName", postData[position].UserName)
-
-                startActivity(intent)
-                requireActivity().overridePendingTransition(R.anim.pull_anim, R.anim.invisible)
+                SimpleIntentModule.simplyActivity(requireActivity(), position, postData)
             }
         })
 
@@ -86,55 +78,6 @@ open class ProfileFragment : Fragment() {
         requireActivity().startActivityForResult(intent, FROM_ALBUM)
     }
 
-    private fun findBoard(name : String){
-        // read bbs db
-        postDataList?.clear()
-
-        database.child("board").child("path").addChildEventListener(object : ChildEventListener {
-            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                val dataObject = snapshot.getValue(PostData::class.java)
-                if(name == dataObject?.UserName){
-                    postDataList!!.add(0, PostData(dataObject!!.title, dataObject.content, dataObject.image_url,
-                            dataObject.dateTime, dataObject.genre, dataObject.viewType, dataObject.UserName, dataObject.commentCount,
-                            dataObject.commentList, dataObject.key))
-                }
-
-                writeAdapter!!.setData(postDataList)
-            }
-
-            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                postDataList?.clear()
-                val dataObject = snapshot.getValue(PostData::class.java)
-                if(name == dataObject?.UserName){
-                    postDataList!!.add(0, PostData(dataObject!!.title, dataObject.content, dataObject.image_url,
-                            dataObject.dateTime, dataObject.genre, dataObject.viewType, dataObject.UserName, dataObject.commentCount,
-                            dataObject.commentList, dataObject.key))
-                }
-                writeAdapter!!.setData(postDataList)
-            }
-
-            override fun onChildRemoved(snapshot: DataSnapshot) {
-                postDataList?.clear()
-                val dataObject = snapshot.getValue(PostData::class.java)
-                if(name == dataObject?.UserName){
-                    postDataList!!.add(0, PostData(dataObject!!.title, dataObject.content, dataObject.image_url,
-                            dataObject.dateTime, dataObject.genre, dataObject.viewType, dataObject.UserName, dataObject.commentCount,
-                            dataObject.commentList, dataObject.key))
-                }
-                writeAdapter!!.setData(postDataList)
-            }
-
-            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                Log.e("Error", databaseError.message)
-            }
-        })
-
-        //end
-    }
     private fun getUserName() {
         val sharedPreference : SharedPreferences = requireContext().getSharedPreferences("Account", Context.MODE_PRIVATE)
         database.child("user").addListenerForSingleValueEvent(object : ValueEventListener {
@@ -145,14 +88,14 @@ open class ProfileFragment : Fragment() {
                     Log.d("s", "${sharedPreference.getString("Email", null)} : ${user!!.userEmail}")
                     if (sharedPreference.getString("Email", null).equals(user!!.userEmail)) {
                         profileBinding!!.nameText.text = user.userName
-                        profileBinding!!.emailText?.text = user.userEmail
+                        profileBinding!!.emailText.text = user.userEmail
                         key = user.key
                         users = user
-                        val storage : FirebaseStorage?= FirebaseStorage.getInstance()
-                        val storageRef: StorageReference = storage!!.reference.child("${user.userProfile}")
+                        val storage : FirebaseStorage = FirebaseStorage.getInstance()
+                        val storageRef: StorageReference = storage.reference.child("${user.userProfile}")
                         GlideApp.with(requireActivity()).load(storageRef).centerCrop().into(profileBinding?.imageProfile!!)
                         mainViewModel?.userAccount?.value = user
-                        findBoard(users?.userName!!)
+                        FirebaseDatabaseModule.findBoard(users?.userName!!, writeAdapter!!, FirebaseDatabaseModule.NAME)
                         break
                     }
                 }

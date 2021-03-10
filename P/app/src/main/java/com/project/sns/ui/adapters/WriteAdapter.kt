@@ -68,7 +68,7 @@ class WriteAdapter(private val aContext: Context, private val listener: onClickI
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val (title, content, image_url, dateTime) = postData!![position]
+        val (title, content, image_url, file_url,dateTime) = postData!![position]
 
         if(holder is WriteViewHolder){
             holder.title.text = title
