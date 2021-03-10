@@ -19,7 +19,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.project.sns.R
-import com.project.sns.data.user.User
+import com.project.sns.data.board.User
 import com.project.sns.databinding.FragmentSignUpBinding
 import com.project.sns.ui.activities.MainActivity
 

@@ -19,11 +19,12 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.project.sns.GlideApp
 import com.project.sns.R
-import com.project.sns.data.user.User
-import com.project.sns.data.write.PostData
+import com.project.sns.data.board.PostData
+import com.project.sns.data.board.User
 import com.project.sns.databinding.FragmentProfileBinding
-import com.project.sns.ui.activities.ReadActivity
+import com.project.sns.ui.activities.write.ReadActivity
 import com.project.sns.ui.adapters.WriteAdapter
+import com.project.sns.ui.adapters.listener.onClickItemListener
 import com.project.sns.ui.viewmodel.MainViewModel
 
 open class ProfileFragment : Fragment() {
@@ -52,18 +53,21 @@ open class ProfileFragment : Fragment() {
         getUserName()
 
 
-        writeAdapter = WriteAdapter(requireContext()) { position: Int, listPostData: List<PostData> ->
-            val intent = Intent(requireActivity(), ReadActivity::class.java)
-            intent.putExtra("title", listPostData[position].title)
-            intent.putExtra("content", listPostData[position].content)
-            intent.putExtra("genre", listPostData[position].genre)
-            intent.putExtra("key", listPostData[position].key)
-            intent.putExtra("commentCount", listPostData[position].commentCount)
-            intent.putExtra("image", listPostData[position].image_url)
-            intent.putExtra("userName", listPostData[position].UserName)
-            startActivity(intent)
-            requireActivity().overridePendingTransition(R.anim.pull_anim, R.anim.invisible);
-        }
+        writeAdapter = WriteAdapter(requireContext(), object : onClickItemListener {
+            override fun onClickItem(position: Int, postData: ArrayList<PostData>) {
+                val intent = Intent(requireActivity(), ReadActivity::class.java)
+                intent.putExtra("title", postData[position].title)
+                intent.putExtra("content", postData[position].content)
+                intent.putExtra("genre", postData[position].genre)
+                intent.putExtra("key", postData[position].key)
+                intent.putExtra("commentCount", postData[position].commentCount)
+                intent.putExtra("image", postData[position].image_url)
+                intent.putExtra("userName", postData[position].UserName)
+
+                startActivity(intent)
+                requireActivity().overridePendingTransition(R.anim.pull_anim, R.anim.invisible)
+            }
+        })
 
         profileBinding?.recyclerView?.layoutManager = LinearLayoutManager(requireContext())
         profileBinding?.recyclerView?.adapter = writeAdapter
@@ -146,7 +150,7 @@ open class ProfileFragment : Fragment() {
                         users = user
                         val storage : FirebaseStorage?= FirebaseStorage.getInstance()
                         val storageRef: StorageReference = storage!!.reference.child("${user.userProfile}")
-                        GlideApp.with(requireActivity()).load(storageRef).into(profileBinding?.imageProfile!!)
+                        GlideApp.with(requireActivity()).load(storageRef).centerCrop().into(profileBinding?.imageProfile!!)
                         mainViewModel?.userAccount?.value = user
                         findBoard(users?.userName!!)
                         break

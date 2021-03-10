@@ -13,8 +13,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.project.sns.GlideApp
 import com.project.sns.R
-import com.project.sns.data.comment.Comment
-import com.project.sns.data.write.PostData
+import com.project.sns.data.board.Comment
 import com.project.sns.ui.adapters.listener.onClickItemListener
 import de.hdodenhof.circleimageview.CircleImageView
 import java.text.SimpleDateFormat

@@ -12,7 +12,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.project.sns.R
-import com.project.sns.data.category.Genre
+import com.project.sns.data.board.Genre
 import com.project.sns.databinding.FragmentPostClassBinding
 import com.tapadoo.alerter.Alerter
 import com.tapadoo.alerter.OnHideAlertListener

@@ -16,15 +16,17 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.project.sns.data.category.Genre
-import com.project.sns.data.user.User
-import com.project.sns.data.write.PostData
+import com.project.sns.data.board.Genre
+import com.project.sns.data.board.PostData
+import com.project.sns.data.board.User
 import com.project.sns.databinding.FragmentHomeBinding
 import com.project.sns.ui.activities.MainActivity
-import com.project.sns.ui.activities.ReadActivity
+import com.project.sns.ui.activities.write.ReadActivity
 import com.project.sns.ui.activities.write.WriteActivity
 import com.project.sns.ui.adapters.WriteAdapter
+import com.project.sns.ui.adapters.listener.onClickItemListener
 import com.project.sns.ui.viewmodel.MainViewModel
+import kotlinx.coroutines.*
 
 
 class HomeFragment : Fragment() {
@@ -32,7 +34,7 @@ class HomeFragment : Fragment() {
     private var writeAdapter: WriteAdapter? = null
     private var homeBinding: FragmentHomeBinding? = null
     private var arrayAdapterGenre : ArrayAdapter<String> ?= null
-    private var postDataList: ArrayList<PostData> ?= ArrayList()
+    private var postDataList: ArrayList<PostData> = ArrayList()
     private lateinit var database: DatabaseReference
     private var mainViewModel : MainViewModel ?= null
     private var menu : Menu ?= null
@@ -55,9 +57,15 @@ class HomeFragment : Fragment() {
         val sharedPreferences = requireContext().getSharedPreferences("Account", Context.MODE_PRIVATE)
         database = Firebase.database.reference
 
-            initLayout(sharedPreferences)
+
+
+        GlobalScope.launch {
             initRecyclerViews()
         }
+
+        initLayout(sharedPreferences)
+
+    }
 
     private fun initLayout(sharedPreferences : SharedPreferences) {
         val headerView: View = homeBinding?.navView?.getHeaderView(0)!!
@@ -100,27 +108,44 @@ class HomeFragment : Fragment() {
             return@setNavigationItemSelectedListener true
         }
     }
-    private fun initRecyclerViews() {
-        writeAdapter = WriteAdapter(requireContext()) { position: Int, listPostData: List<PostData> ->
-            val intent = Intent(requireActivity(), ReadActivity::class.java)
-            intent.putExtra("title", listPostData[position].title)
-            intent.putExtra("content", listPostData[position].content)
-            intent.putExtra("genre", listPostData[position].genre)
-            intent.putExtra("key", listPostData[position].key)
-            intent.putExtra("commentCount", listPostData[position].commentCount)
-            intent.putExtra("image", listPostData[position].image_url)
-            intent.putExtra("userName", listPostData[position].UserName)
-            startActivity(intent)
-            requireActivity().overridePendingTransition(com.project.sns.R.anim.pull_anim, com.project.sns.R.anim.invisible);
+    private suspend fun initRecyclerViews() {
 
-            arrayAdapterGenre = ArrayAdapter<String>(requireContext(), R.layout.simple_spinner_dropdown_item)
-            arrayAdapterGenre!!.setDropDownViewResource(R.layout.simple_spinner_dropdown_item)
+        arrayAdapterGenre = ArrayAdapter<String>(requireContext(), R.layout.simple_spinner_dropdown_item)
+        arrayAdapterGenre!!.setDropDownViewResource(R.layout.simple_spinner_dropdown_item)
 
-            readCategory()
-            readBoard()
+        writeAdapter = WriteAdapter(requireContext(), object : onClickItemListener {
+            override fun onClickItem(position: Int, postData: ArrayList<PostData>) {
+                val intent = Intent(requireActivity(), ReadActivity::class.java)
+                intent.putExtra("title", postData[position].title)
+                intent.putExtra("content", postData[position].content)
+                intent.putExtra("genre", postData[position].genre)
+                intent.putExtra("key", postData[position].key)
+                intent.putExtra("commentCount", postData[position].commentCount)
+                intent.putExtra("image", postData[position].image_url)
+                intent.putExtra("userName", postData[position].UserName)
+                startActivity(intent)
+                requireActivity().overridePendingTransition(com.project.sns.R.anim.pull_anim, com.project.sns.R.anim.invisible);
+            }
+        })
 
-            homeBinding!!.recyclerSubject.adapter = writeAdapter
+        writeAdapter?.clearData()
+
+        val jobCompleted : Deferred<Boolean> = CoroutineScope(Dispatchers.IO).async {
+            val job : Job = GlobalScope.async {
+                readBoard()
+                readCategory()
+            }
+
+            job.join()
+
+            true
+        }
+
+        jobCompleted.await()
+
+        if(jobCompleted.isCompleted) {
             homeBinding!!.recyclerSubject.layoutManager = LinearLayoutManager(context)
+            homeBinding!!.recyclerSubject.adapter = writeAdapter
         }
     }
 
@@ -152,12 +177,6 @@ class HomeFragment : Fragment() {
                     subMenu?.add(0, menuItemId, 0, dataObject.genre)
                     menuItemId++
                 }
-            }
-            2 -> {
-                val dataObject = snapshot.getValue(PostData::class.java)
-                postDataList!!.add(0, PostData(dataObject!!.title, dataObject.content, dataObject.image_url,
-                        dataObject.dateTime, dataObject.genre, dataObject.viewType, dataObject.UserName, dataObject.commentCount,
-                        dataObject.commentList, dataObject.key))
             }
         }
 
@@ -241,7 +260,6 @@ class HomeFragment : Fragment() {
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
                 dataClear(snapshot, 1)
-
             }
 
             override fun onChildRemoved(snapshot: DataSnapshot) {
@@ -261,38 +279,54 @@ class HomeFragment : Fragment() {
         //end
     }
 
-    private fun readBoard() {
+    private suspend fun readBoard() {
         // read bbs db
-        database.child("board").child("path").addChildEventListener(object : ChildEventListener {
-            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                dataClear(snapshot, 2)
-                writeAdapter!!.setData(postDataList)
+
+        writeAdapter?.clearData()
+        val jobAwait : Deferred<Boolean> = CoroutineScope(Dispatchers.IO).async {
+
+            val jobProgress : Job = GlobalScope.async {
+                database.child("board").child("path").addChildEventListener(object : ChildEventListener {
+                    override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                        val dataObject = snapshot.getValue(PostData::class.java)
+                        postDataList.add(0, PostData(dataObject!!.title, dataObject.content, dataObject.image_url,
+                                dataObject.dateTime, dataObject.genre, dataObject.viewType, dataObject.UserName, dataObject.commentCount,
+                                dataObject.commentList, dataObject.key))
+                        writeAdapter!!.setData(postDataList)
+                    }
+
+                    override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                    }
+
+                    override fun onChildRemoved(snapshot: DataSnapshot) {
+                        val dataObject = snapshot.getValue(PostData::class.java)
+                    }
+
+                    override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+                    }
+
+                    override fun onCancelled(databaseError: DatabaseError) {
+                        Log.e("Error", databaseError.message)
+                    }
+                })
             }
 
-            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                postDataList?.clear()
-                val dataObject = snapshot.getValue(PostData::class.java)
-                findBoard(dataObject?.genre!!)
-                writeAdapter!!.setData(postDataList)
-            }
+            jobProgress.join()
 
-            override fun onChildRemoved(snapshot: DataSnapshot) {
-                postDataList?.clear()
-                val dataObject = snapshot.getValue(PostData::class.java)
-                findBoard(dataObject?.genre!!)
-                writeAdapter!!.setData(postDataList)
-            }
+            true
+        }
 
-            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                Log.e("Error", databaseError.message)
-            }
-        })
+        jobAwait.await()
 
         //end
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        GlobalScope.launch {
+            readBoard()
+        }
     }
 
     override fun onStart() {

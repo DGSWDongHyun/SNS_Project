@@ -29,8 +29,7 @@ import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import com.project.sns.GlideApp
 import com.project.sns.R
-import com.project.sns.data.user.User
-import com.project.sns.data.write.PostData
+import com.project.sns.data.board.User
 import com.project.sns.databinding.ActivityMainBinding
 import com.project.sns.databinding.FragmentHomeBinding
 import com.project.sns.ui.activities.splash.IntroActivity

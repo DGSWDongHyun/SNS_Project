@@ -32,9 +32,9 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import com.project.sns.R
-import com.project.sns.data.category.Genre
-import com.project.sns.data.comment.Comment
-import com.project.sns.data.write.PostData
+import com.project.sns.data.board.Comment
+import com.project.sns.data.board.Genre
+import com.project.sns.data.board.PostData
 import com.project.sns.databinding.ActivityWriteBinding
 import com.project.sns.ui.viewmodel.MainViewModel
 import com.tapadoo.alerter.Alert
@@ -43,7 +43,7 @@ import com.tapadoo.alerter.Alert
 class WriteActivity : AppCompatActivity() {
 
     var writeBinding : ActivityWriteBinding ?= null
-    var postData : PostData ?= null
+    var postData : PostData?= null
     var viewModel : MainViewModel ?= null
     var database : DatabaseReference ?= null
     var commentList : HashMap<String, Comment> ?= HashMap()

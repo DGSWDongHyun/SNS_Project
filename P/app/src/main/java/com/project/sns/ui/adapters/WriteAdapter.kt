@@ -16,7 +16,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.project.sns.GlideApp
 import com.project.sns.R
-import com.project.sns.data.write.PostData
+import com.project.sns.data.board.PostData
 import com.project.sns.ui.adapters.listener.onClickItemListener
 import java.text.SimpleDateFormat
 
@@ -25,15 +25,19 @@ class WriteAdapter(private val aContext: Context, private val listener: onClickI
     private var positionCheck = 0
     private var isStartViewCheck = true
     var database : DatabaseReference ?= null
-    private var postData: List<PostData>? = null
+    private var postData: ArrayList<PostData>? = null
 
     fun setData(postData: ArrayList<PostData>?) {
         this.postData = postData
         notifyDataSetChanged()
     }
 
-    fun getData() : List<PostData>{
+    fun getData() : ArrayList<PostData>{
         return postData!!;
+    }
+
+    fun clearData() : Boolean {
+       return if(postData != null) { postData?.clear(); true } else { false }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -41,22 +45,18 @@ class WriteAdapter(private val aContext: Context, private val listener: onClickI
 
         when(viewType){
             BOARD -> {
-
                 root = LayoutInflater.from(parent.context).inflate(R.layout.item_subjects, parent, false)
                 return WriteViewHolder(root!!)
 
             }
 
             REFRESH -> {
-
                 root = LayoutInflater.from(parent.context).inflate(R.layout.item_refresh, parent, false)
                 return RefreshViewHolder(root!!)
-
             }
 
             else -> {
-
-                root = LayoutInflater.from(parent.context).inflate(R.layout.wrong_item, parent, false)
+                root = LayoutInflater.from(parent.context).inflate(R.layout.item_wrong, parent, false)
                 return WrongViewHolder(root!!)
 
             }
@@ -79,9 +79,9 @@ class WriteAdapter(private val aContext: Context, private val listener: onClickI
                 if (position > 6) isStartViewCheck = false
             } else {
                 if (position > positionCheck) {
-                    holder.view_animation.animation = AnimationUtils.loadAnimation(aContext, R.anim.fall_down)
+                    holder.viewAnimation.animation = AnimationUtils.loadAnimation(aContext, R.anim.fall_down)
                 } else {
-                    holder.view_animation.animation = AnimationUtils.loadAnimation(aContext, R.anim.raise_up)
+                    holder.viewAnimation.animation = AnimationUtils.loadAnimation(aContext, R.anim.raise_up)
                 }
             }
 
@@ -102,7 +102,7 @@ class WriteAdapter(private val aContext: Context, private val listener: onClickI
             }else{
                 holder.imagePreview.visibility = View.GONE
             }
-            holder.itemView.setOnClickListener { v: View? -> listener.onClickItem(position, postData) }
+            holder.itemView.setOnClickListener { v: View? ->  listener.onClickItem(position, postData!!)}
             positionCheck = position
         }else if(holder is RefreshViewHolder){
         }
@@ -120,7 +120,7 @@ class WriteAdapter(private val aContext: Context, private val listener: onClickI
     inner class WriteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val title: TextView = itemView.findViewById(R.id.title)
         val dateTime : TextView = itemView.findViewById(R.id.date_time)
-        val view_animation: ConstraintLayout = itemView.findViewById(R.id.view_animation)
+        val viewAnimation: ConstraintLayout = itemView.findViewById(R.id.view_animation)
         val commentCount : TextView = itemView.findViewById(R.id.commentText)
         val imagePreview : CardView = itemView.findViewById(R.id.cardImage)
         val imagePreviews : ImageView = itemView.findViewById(R.id.image_preview)

@@ -20,7 +20,6 @@ import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.project.sns.R
-import com.project.sns.data.user.User
 import com.project.sns.databinding.FragmentSignInBinding
 import com.project.sns.ui.activities.MainActivity
 
@@ -51,7 +50,6 @@ class SignInFragment : Fragment() {
         registerBinding!!.isCheckedAuto.isChecked = sharedPreferences!!.getBoolean("isChecked", false)
 
         if (registerBinding!!.isCheckedAuto.isChecked) {
-
             doLogin()
         }
 
