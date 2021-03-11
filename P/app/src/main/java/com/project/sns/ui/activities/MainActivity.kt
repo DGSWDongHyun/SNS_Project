@@ -14,6 +14,7 @@ import android.view.Window
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.navigation.ui.AppBarConfiguration
@@ -69,8 +70,6 @@ class MainActivity : AppCompatActivity() {
 
         }
     }
-
-
     private fun initCallback(){
         database = Firebase.database.reference
 
@@ -126,7 +125,7 @@ class MainActivity : AppCompatActivity() {
     private fun makeConfirmDialog(data: Uri?, flag: Int) {
 
         val filename = "uploaded" + "_" + System.currentTimeMillis()
-        val storage : FirebaseStorage?= FirebaseStorage.getInstance()
+        val storage : FirebaseStorage = FirebaseStorage.getInstance()
         val storageRef: StorageReference = storage!!.reference.child("profiles/$filename")
         val uploadTask: UploadTask
         var file: Uri? = null
@@ -143,9 +142,8 @@ class MainActivity : AppCompatActivity() {
             exception ->  exception.printStackTrace()
         }).addOnSuccessListener(OnSuccessListener<Any> { taskSnapshot ->
             progressDialog.dismiss()
-            database.child("user").child(mainViewModel?.key?.value!!)
-                    .setValue(User(mainViewModel?.userAccount?.value?.userName, mainViewModel?.userAccount?.value?.userEmail,
-                            mainViewModel?.userAccount?.value?.key , "profiles/$filename"))
+            database.child("user").child(mainViewModel?.key?.value!!).setValue(User(mainViewModel?.userAccount?.value?.userName, mainViewModel?.userAccount?.value?.userEmail,
+                    mainViewModel?.userAccount?.value?.key , "profiles/$filename"))
         })
     }
     private fun showAlerter(resultCode: Int) {
@@ -158,21 +156,6 @@ class MainActivity : AppCompatActivity() {
                     .setDuration(3000)
                     .setTitleAppearance(R.style.TextTheme)
                     .setTextAppearance(R.style.TextTheme)
-                    .setOnClickListener(
-                            View.OnClickListener {
-                                // do something when
-                                // Alerter message was clicked
-                            })
-                    .setOnShowListener(
-                            OnShowAlertListener {
-                                // do something when
-                                // Alerter message shows
-                            })
-                    .setOnHideListener(
-                            OnHideAlertListener {
-                                // do something when
-                                // Alerter message hides
-                            })
                     .show()
         }else{
             Alerter.create(this@MainActivity)
@@ -183,21 +166,6 @@ class MainActivity : AppCompatActivity() {
                     .setDuration(3000)
                     .setTitleAppearance(R.style.TextTheme)
                     .setTextAppearance(R.style.TextTheme)
-                    .setOnClickListener(
-                            View.OnClickListener {
-                                // do something when
-                                // Alerter message was clicked
-                            })
-                    .setOnShowListener(
-                            OnShowAlertListener {
-                                // do something when
-                                // Alerter message shows
-                            })
-                    .setOnHideListener(
-                            OnHideAlertListener {
-                                // do something when
-                                // Alerter message hides
-                            })
                     .show()
         }
     }

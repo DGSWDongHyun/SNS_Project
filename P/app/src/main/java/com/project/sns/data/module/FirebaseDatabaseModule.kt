@@ -8,17 +8,22 @@ import android.view.SubMenu
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import com.google.firebase.database.*
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import com.project.sns.GlideApp
 import com.project.sns.data.board.Genre
 import com.project.sns.data.board.PostData
 import com.project.sns.data.board.User
 import com.project.sns.databinding.FragmentHomeBinding
+import com.project.sns.databinding.FragmentProfileBinding
 import com.project.sns.ui.activities.write.WriteActivity
 import com.project.sns.ui.adapters.WriteAdapter
+import com.project.sns.ui.viewmodel.MainViewModel
 import kotlinx.coroutines.*
 
 class FirebaseDatabaseModule {
     companion object {
-        private val database = FirebaseDatabase.getInstance().reference
+        val database = FirebaseDatabase.getInstance().reference
         private var menu : Menu?= null
         var menuItemId = 0
         var users : User ?= null
@@ -69,7 +74,6 @@ class FirebaseDatabaseModule {
                 override fun onCancelled(databaseError: DatabaseError) {}
             })
         }
-
         fun findBoard(name : String, writeAdapter: WriteAdapter, code : Int){
             // read bbs db
             postDataList.clear()

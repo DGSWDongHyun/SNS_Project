@@ -20,5 +20,5 @@ class MainViewModel : ViewModel() {
     var fragmentViewProfile : MutableLiveData<FragmentProfileBinding> = MutableLiveData()
     var key : MutableLiveData<String> = MutableLiveData()
     var data : MutableLiveData<Uri> = MutableLiveData()
-    var userAccount : MutableLiveData< User> = MutableLiveData()
+    var userAccount : MutableLiveData<User> = MutableLiveData()
 }

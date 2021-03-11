@@ -28,6 +28,7 @@ import com.project.sns.ui.activities.write.ReadActivity
 import com.project.sns.ui.adapters.WriteAdapter
 import com.project.sns.ui.adapters.listener.onClickItemListener
 import com.project.sns.ui.viewmodel.MainViewModel
+import kotlinx.coroutines.*
 
 open class ProfileFragment : Fragment() {
 
@@ -35,16 +36,12 @@ open class ProfileFragment : Fragment() {
     private var mainViewModel : MainViewModel?= null
     var profileBinding : FragmentProfileBinding ?= null
     var key : String ?= ""
-    var users : User ?= null
     private var writeAdapter: WriteAdapter? = null
-    private var postDataList: ArrayList<PostData> ?= ArrayList()
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         profileBinding = FragmentProfileBinding.inflate(layoutInflater)
-        mainViewModel = ViewModelProvider(requireActivity()).get(MainViewModel::class.java)
-        database = Firebase.database.reference
 
         return profileBinding!!.root
     }
@@ -52,8 +49,14 @@ open class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        getUserName()
+        mainViewModel = ViewModelProvider(requireActivity()).get(MainViewModel::class.java)
+        database = Firebase.database.reference
 
+        GlobalScope.launch {
+            withContext(Dispatchers.Main)  {
+                onWaitLoad()
+            }
+        }
 
         writeAdapter = WriteAdapter(requireContext(), object : onClickItemListener {
             override fun onClickItem(position: Int, postData: ArrayList<PostData>) {
@@ -63,39 +66,61 @@ open class ProfileFragment : Fragment() {
 
         profileBinding?.recyclerView?.layoutManager = LinearLayoutManager(requireContext())
         profileBinding?.recyclerView?.adapter = writeAdapter
-
-        profileBinding?.imageProfile?.setOnClickListener {
-            selectAlbum()
-        }
+        
     }
 
-    private fun selectAlbum() {
-        mainViewModel?.fragmentViewProfile?.value = profileBinding
-        mainViewModel?.key?.value = key!!
-        val intent = Intent(Intent.ACTION_PICK)
-        intent.type = MediaStore.Images.Media.CONTENT_TYPE
-        intent.type = "image/*"
-        requireActivity().startActivityForResult(intent, FROM_ALBUM)
+    private suspend fun onWaitLoad() {
+        val jobCompleted : Deferred<Boolean> = CoroutineScope(Dispatchers.IO).async {
+            val job : Job = GlobalScope.async {
+              getUserName()
+            }
+
+            job.join()
+
+            true
+        }
+
+        jobCompleted.await()
     }
 
     private fun getUserName() {
         val sharedPreference : SharedPreferences = requireContext().getSharedPreferences("Account", Context.MODE_PRIVATE)
-        database.child("user").addListenerForSingleValueEvent(object : ValueEventListener {
+        FirebaseDatabaseModule.database.child("user").addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 for (snapshot in dataSnapshot.children) {
                     val user = snapshot.getValue(User::class.java)
                     Log.d("s", sharedPreference.getString("Email", null).equals(user!!.userEmail).toString())
-                    Log.d("s", "${sharedPreference.getString("Email", null)} : ${user!!.userEmail}")
-                    if (sharedPreference.getString("Email", null).equals(user!!.userEmail)) {
-                        profileBinding!!.nameText.text = user.userName
-                        profileBinding!!.emailText.text = user.userEmail
-                        key = user.key
-                        users = user
+                    Log.d("s", "${sharedPreference.getString("Email", null)} : ${user.userEmail}")
+                    if (sharedPreference.getString("Email", null).equals(user.userEmail)) {
+
+                        profileBinding?.nameText?.text = user.userName
+                        profileBinding?.emailText?.text = user.userEmail
+                        key = user.key.toString()
+
                         val storage : FirebaseStorage = FirebaseStorage.getInstance()
                         val storageRef: StorageReference = storage.reference.child("${user.userProfile}")
-                        GlideApp.with(requireActivity()).load(storageRef).centerCrop().into(profileBinding?.imageProfile!!)
-                        mainViewModel?.userAccount?.value = user
-                        FirebaseDatabaseModule.findBoard(users?.userName!!, writeAdapter!!, FirebaseDatabaseModule.NAME)
+                        GlideApp.with(requireContext()).load(storageRef).centerCrop().into(profileBinding!!.imageProfile)
+
+                        GlobalScope.launch {
+                            withContext(Dispatchers.Main) {
+                                val jobToCompleted : Deferred<Boolean> = CoroutineScope(Dispatchers.Main).async {
+                                    val job  : Job = GlobalScope.async {
+                                        mainViewModel?.userAccount?.value = user
+                                    }
+                                    job.join()
+
+                                    true
+                                }
+                                jobToCompleted.await()
+
+                                if(jobToCompleted.isCompleted) {
+                                    FirebaseDatabaseModule.findBoard(FirebaseDatabaseModule.users?.userName!!, writeAdapter!!, FirebaseDatabaseModule.NAME)
+                                }
+                            }
+                        }
+
+                        Log.d("TAG", "${user}, ${mainViewModel?.userAccount?.value}, $mainViewModel")
+
                         break
                     }
                 }
@@ -104,6 +129,15 @@ open class ProfileFragment : Fragment() {
             override fun onCancelled(databaseError: DatabaseError) {}
         })
     }
+
+
+    private fun selectAlbum() {
+        val intent = Intent(Intent.ACTION_PICK)
+        intent.type = MediaStore.Images.Media.CONTENT_TYPE
+        intent.type = "image/*"
+        requireActivity().startActivityForResult(intent, FROM_ALBUM)
+    }
+
 
     companion object{
         const val FROM_ALBUM = 2
