@@ -7,6 +7,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
@@ -31,6 +32,7 @@ import com.google.firebase.storage.UploadTask
 import com.project.sns.GlideApp
 import com.project.sns.R
 import com.project.sns.data.board.User
+import com.project.sns.data.module.*
 import com.project.sns.databinding.ActivityMainBinding
 import com.project.sns.databinding.FragmentHomeBinding
 import com.project.sns.ui.activities.splash.IntroActivity
@@ -39,6 +41,12 @@ import com.project.sns.ui.viewmodel.MainViewModel
 import com.tapadoo.alerter.Alerter
 import com.tapadoo.alerter.OnHideAlertListener
 import com.tapadoo.alerter.OnShowAlertListener
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import retrofit2.Call
+import retrofit2.Response
 
 
 class MainActivity : AppCompatActivity() {
@@ -143,7 +151,7 @@ class MainActivity : AppCompatActivity() {
         }).addOnSuccessListener(OnSuccessListener<Any> { taskSnapshot ->
             progressDialog.dismiss()
             database.child("user").child(mainViewModel?.key?.value!!).setValue(User(mainViewModel?.userAccount?.value?.userName, mainViewModel?.userAccount?.value?.userEmail,
-                    mainViewModel?.userAccount?.value?.key , "profiles/$filename"))
+                    mainViewModel?.userAccount?.value?.key , "profiles/$filename", mainViewModel?.userAccount?.value?.deviceToken, mainViewModel?.userAccount?.value?.likeGenre))
         })
     }
     private fun showAlerter(resultCode: Int) {
@@ -157,6 +165,12 @@ class MainActivity : AppCompatActivity() {
                     .setTitleAppearance(R.style.TextTheme)
                     .setTextAppearance(R.style.TextTheme)
                     .show()
+
+            GlobalScope.launch {
+                 withContext(Dispatchers.IO) {
+                     FirebaseDatabaseModule.sendNotification()
+                 }
+            }
         }else{
             Alerter.create(this@MainActivity)
                     .setTitle("띵동!")

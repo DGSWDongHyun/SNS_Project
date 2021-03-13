@@ -98,8 +98,8 @@ open class ProfileFragment : Fragment() {
                         key = user.key.toString()
 
                         val storage : FirebaseStorage = FirebaseStorage.getInstance()
-                        val storageRef: StorageReference = storage.reference.child("${user.userProfile}")
-                        GlideApp.with(requireContext()).load(storageRef).centerCrop().into(profileBinding!!.imageProfile)
+                       // val storageRef: StorageReference = storage.reference.child("${user.userProfile}")
+                       // GlideApp.with(requireContext()).load(storageRef).centerCrop().into(profileBinding!!.imageProfile)
 
                         GlobalScope.launch {
                             withContext(Dispatchers.Main) {

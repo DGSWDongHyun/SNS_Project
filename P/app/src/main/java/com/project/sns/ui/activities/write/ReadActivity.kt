@@ -86,8 +86,8 @@ class ReadActivity : AppCompatActivity() {
                     if (sharedPreference.getString("Email", null).equals(user!!.userEmail)) {
                         userMember = user
                         val storage : FirebaseStorage?= FirebaseStorage.getInstance()
-                        val storageRef: StorageReference = storage!!.reference.child("${user.userProfile}")
-                        GlideApp.with(this@ReadActivity).load(storageRef).into(readBinding?.profileImage!!)
+                        //val storageRef: StorageReference = storage!!.reference.child("${user.userProfile}")
+                        //GlideApp.with(this@ReadActivity).load(storageRef).into(readBinding?.profileImage!!)
                         readBinding?.detailTextView?.text = "${intent.getStringExtra("genre")} - ${user.userName}"
                         break
                     }

@@ -82,8 +82,10 @@ class WriteActivity : AppCompatActivity() {
                 if(writeBinding!!.titleEditText.text!!.isNotEmpty() && writeBinding!!.contentEditText.text!!.isNotEmpty()) {
                     if(PHOTO_)
                         makeConfirmDialog(FROM_ALBUM)
-                    else
+                    else if(FILE_)
                         makeConfirmDialog(FILE)
+                    else
+                        makeConfirmDialog(BOARD)
                 }else{
                     Toast.makeText(applicationContext, "제목이나 내용 중에 누락된 부분이 있습니다.", Toast.LENGTH_LONG).show()
                 }
@@ -192,6 +194,13 @@ class WriteActivity : AppCompatActivity() {
                         finish()
                         overridePendingTransition(R.anim.visible, R.anim.invisible);
                     })
+                } else {
+                    val dataLocation = database!!.child("board").child("path").push()
+                    postData = PostData(writeBinding!!.titleEditText.text.toString(), writeBinding!!.contentEditText.text.toString(), "", "", System.currentTimeMillis(), writeBinding?.subjectTextview?.text.toString(), BOARD, intent.getStringExtra("userName").toString(), 0, commentList, dataLocation.key!!)
+                    dataLocation.setValue(postData)
+                    setResult(RESULT_OK)
+                    finish()
+                    overridePendingTransition(R.anim.visible, R.anim.invisible);
                 }
             }
     }
