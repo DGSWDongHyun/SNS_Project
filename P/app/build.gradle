@@ -64,6 +64,7 @@ dependencies {
     implementation 'com.robertlevonyan.view:CustomFloatingActionButton:3.0.1'
     implementation 'com.tapadoo.android:alerter:2.0.4'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
+    implementation "com.arthurivanets.bottomsheet:bottomsheets-core:1.0.0"
 
     //gms
     implementation 'com.google.android.gms:play-services-basement:17.6.0'

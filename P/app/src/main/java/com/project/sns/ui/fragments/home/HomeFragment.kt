@@ -43,9 +43,6 @@ class HomeFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?, savedInstanceState: Bundle?): View? {
         homeBinding = FragmentHomeBinding.inflate(layoutInflater)
-        mainViewModel = ViewModelProvider(requireActivity()).get(MainViewModel::class.java)
-
-        mainViewModel?.fragmentView?.value = homeBinding
         return homeBinding!!.root
     }
 
@@ -159,7 +156,6 @@ class HomeFragment : Fragment() {
         super.onStart()
     }
         override fun onStop() {
-            mainViewModel!!.liveAdapter.value = writeAdapter
             super.onStop()
         }
 }

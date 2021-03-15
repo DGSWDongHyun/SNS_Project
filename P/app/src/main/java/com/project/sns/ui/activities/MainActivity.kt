@@ -66,18 +66,6 @@ class MainActivity : AppCompatActivity() {
         initLayout() // initLayout
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            android.R.id.home -> {
-                mainViewModel?.fragmentView?.value?.drawerLayout?.openDrawer(GravityCompat.START)
-                true
-            }
-            else -> {
-                super.onOptionsItemSelected(item)
-            }
-
-        }
-    }
     private fun initCallback(){
         database = Firebase.database.reference
 
@@ -107,8 +95,6 @@ class MainActivity : AppCompatActivity() {
                     try {
                         val photoURI = data.data
                         mainViewModel?.data?.value = data.data
-
-                        GlideApp.with(this).load(photoURI).into(mainViewModel?.fragmentViewProfile?.value?.imageProfile!!)
                         makeConfirmDialog(mainViewModel?.data?.value, FROM_ALBUM)
                     } catch (e: Exception) {
                         e.printStackTrace()

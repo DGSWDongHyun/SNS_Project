@@ -6,7 +6,10 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.arthurivanets.bottomsheets.BottomSheet
+import com.arthurivanets.bottomsheets.config.Config
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -17,11 +20,15 @@ import com.project.sns.data.board.Comment
 import com.project.sns.data.board.User
 import com.project.sns.databinding.ActivityReadBinding
 import com.project.sns.ui.adapters.CommentAdapter
+import com.project.sns.ui.adapters.listener.onClickItemComment
+import com.project.sns.ui.sheet.DetailBottomSheet
+import com.project.sns.ui.viewmodel.MainViewModel
 
 class ReadActivity : AppCompatActivity() {
     var readBinding : ActivityReadBinding ?= null
     var commentList : ArrayList<Comment> = arrayListOf()
     var userMember : User?= null
+    private lateinit var viewModel : MainViewModel
     private var commentAdapter : CommentAdapter ?= null
 
     private lateinit var database: DatabaseReference
@@ -31,7 +38,18 @@ class ReadActivity : AppCompatActivity() {
         readBinding = ActivityReadBinding.inflate(layoutInflater)
         setContentView(readBinding?.root)
 
-        commentAdapter = CommentAdapter(applicationContext)
+        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+
+        commentAdapter = CommentAdapter(applicationContext, object : onClickItemComment {
+            override fun onClickItem(data: Comment) {
+
+                viewModel.profileUser.value = data
+                Log.d("TAG" , "${viewModel.profileUser.value}")
+
+                val bottomSheet =  DetailBottomSheet(this@ReadActivity, Config.Builder(this@ReadActivity).build()).also(BottomSheet::show)
+                bottomSheet.show()
+            }
+        })
         database = Firebase.database.reference
         val intent = intent
 
@@ -88,7 +106,7 @@ class ReadActivity : AppCompatActivity() {
                         val storage : FirebaseStorage?= FirebaseStorage.getInstance()
                         //val storageRef: StorageReference = storage!!.reference.child("${user.userProfile}")
                         //GlideApp.with(this@ReadActivity).load(storageRef).into(readBinding?.profileImage!!)
-                        readBinding?.detailTextView?.text = "${intent.getStringExtra("genre")} - ${user.userName}"
+                        readBinding?.detailTextView?.text = "${user.userName}, 과목 : ${intent.getStringExtra("genre")}"
                         break
                     }
                 }

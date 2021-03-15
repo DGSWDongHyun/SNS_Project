@@ -47,14 +47,14 @@ internal class FirebaseInstanceIDService : FirebaseMessagingService() {
                     channel, channel_nm,
                     NotificationManager.IMPORTANCE_DEFAULT
             )
-            channelMessage.description = "채널에 대한 설명."
+            channelMessage.description = "Followed Genre"
             channelMessage.enableLights(true)
             channelMessage.enableVibration(true)
             channelMessage.setShowBadge(false)
             channelMessage.vibrationPattern = longArrayOf(100, 200, 100, 200)
             notichannel.createNotificationChannel(channelMessage)
             val notificationBuilder = NotificationCompat.Builder(this, channel)
-                    .setSmallIcon(R.drawable.ic_launcher_background)
+                    .setSmallIcon(R.mipmap.ic_launcher)
                     .setContentTitle(title)
                     .setContentText(message)
                     .setChannelId(channel)
@@ -64,7 +64,7 @@ internal class FirebaseInstanceIDService : FirebaseMessagingService() {
             notificationManager.notify(9999, notificationBuilder.build())
         } else {
             val notificationBuilder = NotificationCompat.Builder(this, "")
-                    .setSmallIcon(R.drawable.ic_launcher_background)
+                    .setSmallIcon(R.mipmap.ic_launcher)
                     .setContentTitle(title)
                     .setContentText(message)
                     .setAutoCancel(true)
