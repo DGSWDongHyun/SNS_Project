@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
@@ -51,7 +52,7 @@ class SignUpFragment : Fragment() {
         signUpFragment!!.registerButton.setOnClickListener {
             if(signUpFragment!!.idTextInput.text!!.isNotEmpty()
                     && signUpFragment!!.passwordTextInput.text!!.isNotEmpty()) {
-                doRegister()
+                doRegister(it)
             }
         }
 
@@ -59,7 +60,7 @@ class SignUpFragment : Fragment() {
             view?.findNavController()!!.navigate(R.id.action_signUpFragment_to_registerFragment)
         }
     }
-    private fun doRegister(){
+    private fun doRegister(view : View){
         firebaseAuth.createUserWithEmailAndPassword(signUpFragment!!.idTextInput.text.toString(), signUpFragment!!.passwordTextInput.text.toString())
                 .addOnCompleteListener(requireActivity(), OnCompleteListener<AuthResult?> { task ->
                     if (task.isSuccessful) {
@@ -76,14 +77,17 @@ class SignUpFragment : Fragment() {
                                 editor?.putString("PassWord", signUpFragment!!.passwordTextInput.text.toString())
                                 editor?.commit()
                             }else{
-                                Toast.makeText(requireContext(), "등록 오류입니다. 불편을 드려서 죄송합니다. Error", Toast.LENGTH_LONG).show()
+                                Snackbar.make(view,"등록을 실패했습니다. 불편을 드려서 죄송합니다.", Snackbar.LENGTH_LONG).show()
                             }
                         }
                         requireActivity().finish()
                     } else {
-                        Toast.makeText(requireContext(), "등록 에러", Toast.LENGTH_SHORT).show()
+                        Snackbar.make(view,"등록을 실패했습니다. 불편을 드려서 죄송합니다.", Snackbar.LENGTH_LONG).show()
                         return@OnCompleteListener
                     }
                 })
+                .addOnFailureListener {
+                    Snackbar.make(view,"등록을 실패했습니다. 불편을 드려서 죄송합니다. Error : ${it.message}", Snackbar.LENGTH_LONG).show()
+                }
     }
 }

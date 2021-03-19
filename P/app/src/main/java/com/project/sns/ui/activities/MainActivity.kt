@@ -90,17 +90,6 @@ class MainActivity : AppCompatActivity() {
             REQUEST_POST -> {
                 showAlerter(resultCode)
             }
-            FROM_ALBUM -> {
-                if (data?.data != null) {
-                    try {
-                        val photoURI = data.data
-                        mainViewModel?.data?.value = data.data
-                        makeConfirmDialog(mainViewModel?.data?.value, FROM_ALBUM)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }
         }
     }
 
@@ -116,30 +105,6 @@ class MainActivity : AppCompatActivity() {
         alertDialog.create().show()
     }
 
-    private fun makeConfirmDialog(data: Uri?, flag: Int) {
-
-        val filename = "uploaded" + "_" + System.currentTimeMillis()
-        val storage : FirebaseStorage = FirebaseStorage.getInstance()
-        val storageRef: StorageReference = storage!!.reference.child("profiles/$filename")
-        val uploadTask: UploadTask
-        var file: Uri? = null
-
-        if (flag == WriteActivity.FROM_ALBUM) {
-            file = data
-        }
-        uploadTask = storageRef.putFile(file!!)
-        val progressDialog = ProgressDialog(this)
-        progressDialog.setMessage("업로드중...")
-        progressDialog.show()
-
-        uploadTask.addOnFailureListener(OnFailureListener {
-            exception ->  exception.printStackTrace()
-        }).addOnSuccessListener(OnSuccessListener<Any> { taskSnapshot ->
-            progressDialog.dismiss()
-            database.child("user").child(mainViewModel?.key?.value!!).setValue(User(mainViewModel?.userAccount?.value?.userName, mainViewModel?.userAccount?.value?.userEmail,
-                    mainViewModel?.userAccount?.value?.key , "profiles/$filename", mainViewModel?.userAccount?.value?.deviceToken, mainViewModel?.userAccount?.value?.likeGenre))
-        })
-    }
     private fun showAlerter(resultCode: Int) {
         if(resultCode == RESULT_OK){
             Alerter.create(this@MainActivity)
