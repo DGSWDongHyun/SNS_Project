@@ -14,12 +14,11 @@ import com.google.firebase.storage.StorageReference
 import com.project.sns.GlideApp
 import com.project.sns.R
 import com.project.sns.data.board.Comment
-import com.project.sns.ui.adapters.listener.onClickItemComment
 import com.project.sns.ui.adapters.listener.onClickItemListener
 import de.hdodenhof.circleimageview.CircleImageView
 import java.text.SimpleDateFormat
 
-class CommentAdapter(private val aContext: Context, private val listener : onClickItemComment) : RecyclerView.Adapter<RecyclerView.ViewHolder?>() {
+class CommentAdapter(private val aContext: Context) : RecyclerView.Adapter<RecyclerView.ViewHolder?>() {
     private var positionCheck = 0
     private var isStartViewCheck = true
     var database : DatabaseReference?= null
@@ -46,17 +45,16 @@ class CommentAdapter(private val aContext: Context, private val listener : onCli
 
         if(holder is CommentViewHolder){
 
-//            val storage : FirebaseStorage?= FirebaseStorage.getInstance()
-//            val storageRef: StorageReference = storage!!.reference.child("${user?.userProfile}")
-//
-//            GlideApp.with(holder.itemView).load(storageRef).into(holder.profile)
+            val storage : FirebaseStorage?= FirebaseStorage.getInstance()
+            val storageRef: StorageReference = storage!!.reference.child("${user?.userProfile}")
+
+            GlideApp.with(holder.itemView).load(storageRef).into(holder.profile)
 
 
             holder.title.text = user?.userName
             holder.commentContent.text = commentContent
             holder.dateTime.text = SimpleDateFormat("yyyy.MM.dd HH : mm").format(commentDateTime).toString()
 
-            holder.itemView.setOnClickListener { listener.onClickItem(commentData!![position]) }
 
             if (isStartViewCheck) {
                 if (position > 6) isStartViewCheck = false

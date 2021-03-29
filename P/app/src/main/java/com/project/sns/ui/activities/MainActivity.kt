@@ -7,7 +7,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
@@ -32,7 +31,6 @@ import com.google.firebase.storage.UploadTask
 import com.project.sns.GlideApp
 import com.project.sns.R
 import com.project.sns.data.board.User
-import com.project.sns.data.module.*
 import com.project.sns.databinding.ActivityMainBinding
 import com.project.sns.databinding.FragmentHomeBinding
 import com.project.sns.ui.activities.splash.IntroActivity
@@ -41,12 +39,6 @@ import com.project.sns.ui.viewmodel.MainViewModel
 import com.tapadoo.alerter.Alerter
 import com.tapadoo.alerter.OnHideAlertListener
 import com.tapadoo.alerter.OnShowAlertListener
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import retrofit2.Call
-import retrofit2.Response
 
 
 class MainActivity : AppCompatActivity() {
@@ -66,6 +58,18 @@ class MainActivity : AppCompatActivity() {
         initLayout() // initLayout
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                mainViewModel?.fragmentView?.value?.drawerLayout?.openDrawer(GravityCompat.START)
+                true
+            }
+            else -> {
+                super.onOptionsItemSelected(item)
+            }
+
+        }
+    }
     private fun initCallback(){
         database = Firebase.database.reference
 
@@ -90,6 +94,19 @@ class MainActivity : AppCompatActivity() {
             REQUEST_POST -> {
                 showAlerter(resultCode)
             }
+            FROM_ALBUM -> {
+                if (data?.data != null) {
+                    try {
+                        val photoURI = data.data
+                        mainViewModel?.data?.value = data.data
+
+                        GlideApp.with(this).load(photoURI).into(mainViewModel?.fragmentViewProfile?.value?.imageProfile!!)
+                        makeConfirmDialog(mainViewModel?.data?.value, FROM_ALBUM)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+            }
         }
     }
 
@@ -105,6 +122,30 @@ class MainActivity : AppCompatActivity() {
         alertDialog.create().show()
     }
 
+    private fun makeConfirmDialog(data: Uri?, flag: Int) {
+
+        val filename = "uploaded" + "_" + System.currentTimeMillis()
+        val storage : FirebaseStorage = FirebaseStorage.getInstance()
+        val storageRef: StorageReference = storage!!.reference.child("profiles/$filename")
+        val uploadTask: UploadTask
+        var file: Uri? = null
+
+        if (flag == WriteActivity.FROM_ALBUM) {
+            file = data
+        }
+        uploadTask = storageRef.putFile(file!!)
+        val progressDialog = ProgressDialog(this)
+        progressDialog.setMessage("업로드중...")
+        progressDialog.show()
+
+        uploadTask.addOnFailureListener(OnFailureListener {
+            exception ->  exception.printStackTrace()
+        }).addOnSuccessListener(OnSuccessListener<Any> { taskSnapshot ->
+            progressDialog.dismiss()
+            database.child("user").child(mainViewModel?.key?.value!!).setValue(User(mainViewModel?.userAccount?.value?.userName, mainViewModel?.userAccount?.value?.userEmail,
+                    mainViewModel?.userAccount?.value?.key , "profiles/$filename"))
+        })
+    }
     private fun showAlerter(resultCode: Int) {
         if(resultCode == RESULT_OK){
             Alerter.create(this@MainActivity)
@@ -116,12 +157,6 @@ class MainActivity : AppCompatActivity() {
                     .setTitleAppearance(R.style.TextTheme)
                     .setTextAppearance(R.style.TextTheme)
                     .show()
-
-            GlobalScope.launch {
-                 withContext(Dispatchers.IO) {
-                     FirebaseDatabaseModule.sendNotification()
-                 }
-            }
         }else{
             Alerter.create(this@MainActivity)
                     .setTitle("띵동!")

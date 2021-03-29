@@ -54,6 +54,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="비밀번호"
+            android:singleLine="true"
             android:inputType="textPassword"
             android:textColor="@android:color/white" />
 
@@ -78,6 +79,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="이메일"
+            android:singleLine="true"
             android:textColor="@android:color/white"
             android:textColorHint="@android:color/white" />
 

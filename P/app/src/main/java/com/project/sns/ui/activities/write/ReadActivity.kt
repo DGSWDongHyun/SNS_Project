@@ -5,11 +5,9 @@ import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.arthurivanets.bottomsheets.BottomSheet
-import com.arthurivanets.bottomsheets.config.Config
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -20,15 +18,14 @@ import com.project.sns.data.board.Comment
 import com.project.sns.data.board.User
 import com.project.sns.databinding.ActivityReadBinding
 import com.project.sns.ui.adapters.CommentAdapter
-import com.project.sns.ui.adapters.listener.onClickItemComment
-import com.project.sns.ui.sheet.DetailBottomSheet
-import com.project.sns.ui.viewmodel.MainViewModel
+import com.project.sns.ui.adapters.ImageListAdapter
+import com.project.sns.ui.adapters.listener.onClickImageListener
 
 class ReadActivity : AppCompatActivity() {
     var readBinding : ActivityReadBinding ?= null
     var commentList : ArrayList<Comment> = arrayListOf()
+    var imageList : ArrayList<StorageReference> = arrayListOf()
     var userMember : User?= null
-    private lateinit var viewModel : MainViewModel
     private var commentAdapter : CommentAdapter ?= null
 
     private lateinit var database: DatabaseReference
@@ -38,18 +35,7 @@ class ReadActivity : AppCompatActivity() {
         readBinding = ActivityReadBinding.inflate(layoutInflater)
         setContentView(readBinding?.root)
 
-        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-
-        commentAdapter = CommentAdapter(applicationContext, object : onClickItemComment {
-            override fun onClickItem(data: Comment) {
-
-                viewModel.profileUser.value = data
-                Log.d("TAG" , "${viewModel.profileUser.value}")
-
-                val bottomSheet =  DetailBottomSheet(this@ReadActivity, Config.Builder(this@ReadActivity).build()).also(BottomSheet::show)
-                bottomSheet.show()
-            }
-        })
+        commentAdapter = CommentAdapter(applicationContext)
         database = Firebase.database.reference
         val intent = intent
 
@@ -60,6 +46,17 @@ class ReadActivity : AppCompatActivity() {
         readComment()
         getImage()
 
+
+        if(!intent.getStringExtra("file").isNullOrEmpty()){
+            Log.d("hasExtra", intent.getStringExtra("file")!!)
+            val storage : FirebaseStorage?= FirebaseStorage.getInstance()
+            val storageRef: StorageReference = storage!!.reference.child("${intent.getStringExtra("file")}")
+
+            readBinding?.downloadFileName?.text = intent.getStringExtra("file")
+        }else {
+            readBinding?.downloadCard?.visibility = View.GONE
+        }
+
         if(!intent.getStringExtra("image").isNullOrEmpty()){
             Log.d("hasExtra", intent.getStringExtra("image")!!)
             val storage : FirebaseStorage?= FirebaseStorage.getInstance()
@@ -67,9 +64,14 @@ class ReadActivity : AppCompatActivity() {
 
             storageRef.downloadUrl.addOnCompleteListener {
                 if(it.isSuccessful){
-                    GlideApp.with(this)
-                        .load (storageRef)
-                        .into (readBinding?.loadedImage!!)
+                    imageList.add(storageRef)
+
+                    readBinding?.imageList?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+                    readBinding?.imageList?.adapter = ImageListAdapter(applicationContext, imageList, object : onClickImageListener {
+                        override fun onClickImage(data: StorageReference) {
+
+                        }
+                    })
                 }else{
                     Toast.makeText(applicationContext, "이미지 로딩에 실패하였습니다.", Toast.LENGTH_LONG).show()
                 }
@@ -104,9 +106,9 @@ class ReadActivity : AppCompatActivity() {
                     if (sharedPreference.getString("Email", null).equals(user!!.userEmail)) {
                         userMember = user
                         val storage : FirebaseStorage?= FirebaseStorage.getInstance()
-                        //val storageRef: StorageReference = storage!!.reference.child("${user.userProfile}")
-                        //GlideApp.with(this@ReadActivity).load(storageRef).into(readBinding?.profileImage!!)
-                        readBinding?.detailTextView?.text = "${user.userName}, 과목 : ${intent.getStringExtra("genre")}"
+                        val storageRef: StorageReference = storage!!.reference.child("${user.userProfile}")
+                        GlideApp.with(this@ReadActivity).load(storageRef).into(readBinding?.profileImage!!)
+                        readBinding?.detailTextView?.text = "${intent.getStringExtra("genre")} - ${user.userName}"
                         break
                     }
                 }

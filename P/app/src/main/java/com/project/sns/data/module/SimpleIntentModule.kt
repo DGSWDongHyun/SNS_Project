@@ -17,6 +17,7 @@ class SimpleIntentModule {
             intent.putExtra("key", postData[position].key)
             intent.putExtra("commentCount", postData[position].commentCount)
             intent.putExtra("image", postData[position].image_url)
+            intent.putExtra("file", postData[position].file_url)
             intent.putExtra("userName", postData[position].UserName)
 
             activity.startActivity(intent)

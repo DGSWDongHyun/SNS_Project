@@ -1,12 +1,16 @@
 package com.project.sns.ui.adapters.listener;
 
-import com.project.sns.data.board.Comment
+import com.google.firebase.storage.StorageReference
 import com.project.sns.data.board.PostData;
 
  interface onClickItemListener {
     fun onClickItem(position : Int,  postData : ArrayList<PostData>);
 }
 
-interface onClickItemComment {
-    fun onClickItem(data : Comment)
+interface onClickImageListener {
+    fun onClickImage(data: StorageReference)
+}
+
+interface onClickItemAdapter {
+    fun onClickAdapter(position : Int,  postData : ArrayList<PostData>);
 }

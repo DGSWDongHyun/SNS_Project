@@ -14,7 +14,6 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
@@ -42,7 +41,7 @@ class SignInFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        initLayout()
+        initLayout();
     }
 
     private fun initLayout() {
@@ -51,11 +50,7 @@ class SignInFragment : Fragment() {
         registerBinding!!.isCheckedAuto.isChecked = sharedPreferences!!.getBoolean("isChecked", false)
 
         if (registerBinding!!.isCheckedAuto.isChecked) {
-            val isLogin = sharedPreferences!!.getBoolean("isLogin", false)
-            Log.d("TAG" , "$isLogin")
-            if(isLogin) {
-                requireActivity().finish()
-            }
+            doLogin()
         }
 
         registerBinding!!.registerText.setTextColor(Color.BLUE)
@@ -67,36 +62,36 @@ class SignInFragment : Fragment() {
 
         registerBinding!!.loginButton.setOnClickListener {
             if (registerBinding!!.idTextInput.text!!.isNotEmpty() && registerBinding!!.passwordTextInput.text!!.isNotEmpty()) {
-                doLogin(it)
+                doLogin()
             }
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        val editor = sharedPreferences!!.edit()
+        if (sharedPreferences!!.getString("Email", "")!!.isEmpty() && sharedPreferences!!.getString("PassWord", "")!!.isEmpty()) {
+            editor?.putString("Email", registerBinding!!.idTextInput.text.toString())
+            editor?.putString("PassWord", registerBinding!!.passwordTextInput.text.toString())
+        }
+        editor.putBoolean("isChecked", registerBinding!!.isCheckedAuto.isChecked)
+        editor.commit()
     }
 
-    private fun doLogin(view : View) {
-        val isLogin = sharedPreferences!!.getBoolean("isLogin", false)
-        Log.d("TAG" , "$isLogin")
-        if (isLogin) {
-                    requireActivity().finish()
-                } else {
-                    firebaseAuth.signInWithEmailAndPassword(registerBinding!!.idTextInput.text.toString(), registerBinding!!.passwordTextInput.text.toString())
-                            .addOnCompleteListener(requireActivity(), OnCompleteListener<AuthResult?> { task ->
-                                if (task.isSuccessful) {
-                                    val editor = sharedPreferences!!.edit()
-
-                                    editor?.putBoolean("isLogin", true)
-                                    editor.putBoolean("isChecked", registerBinding!!.isCheckedAuto.isChecked)
-                                    editor.commit()
-
-                                    requireActivity().finish()
-                                } else {
-                                    Snackbar.make(view,"로그인 오류, 아이디나 비밀번호에 오류가 없는지 다시 확인하세요.", Snackbar.LENGTH_LONG).show()
-                                }
-                            })
-                }
-
+    private fun doLogin() {
+        if (registerBinding!!.isCheckedAuto.isChecked) {
+            if (sharedPreferences!!.getString("Email", "")!!.isNotEmpty()) {
+                requireActivity().finish()
+            } else {
+                firebaseAuth.signInWithEmailAndPassword(registerBinding!!.idTextInput.text.toString(), registerBinding!!.passwordTextInput.text.toString())
+                        .addOnCompleteListener(requireActivity(), OnCompleteListener<AuthResult?> { task ->
+                            if (task.isSuccessful) {
+                                requireActivity().finish()
+                            } else {
+                                Toast.makeText(requireContext(), "로그인 오류, 아이디나 비밀번호에 오류가 없는지 다시 확인하세요.", Toast.LENGTH_SHORT).show()
+                            }
+                        })
+            }
+        }
     }
 }

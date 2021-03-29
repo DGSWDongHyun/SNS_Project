@@ -1,39 +1,30 @@
 package com.project.sns.ui.fragments.profile
 
-import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.gms.tasks.OnFailureListener
-import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
-import com.google.firebase.storage.UploadTask
 import com.project.sns.GlideApp
 import com.project.sns.R
 import com.project.sns.data.board.PostData
 import com.project.sns.data.board.User
 import com.project.sns.data.module.FirebaseDatabaseModule
-import com.project.sns.data.module.FirebaseInfoModule
 import com.project.sns.data.module.SimpleIntentModule
 import com.project.sns.databinding.FragmentProfileBinding
-import com.project.sns.ui.activities.MainActivity
 import com.project.sns.ui.activities.write.ReadActivity
-import com.project.sns.ui.activities.write.WriteActivity
 import com.project.sns.ui.adapters.WriteAdapter
 import com.project.sns.ui.adapters.listener.onClickItemListener
 import com.project.sns.ui.viewmodel.MainViewModel
@@ -41,8 +32,6 @@ import kotlinx.coroutines.*
 
 open class ProfileFragment : Fragment() {
 
-    private lateinit var sharedPreference : SharedPreferences
-    private lateinit var firebaseUser : User
     private lateinit var database: DatabaseReference
     private var mainViewModel : MainViewModel?= null
     var profileBinding : FragmentProfileBinding ?= null
@@ -60,11 +49,6 @@ open class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        GlobalScope.async {
-            firebaseUser = FirebaseInfoModule.getUserInfo(sharedPreference.getString("Email", null)!!)!!
-        }
-
-        sharedPreference  = requireContext().getSharedPreferences("Account", Context.MODE_PRIVATE)
         mainViewModel = ViewModelProvider(requireActivity()).get(MainViewModel::class.java)
         database = Firebase.database.reference
 
@@ -80,13 +64,9 @@ open class ProfileFragment : Fragment() {
             }
         })
 
-//        profileBinding?.imageProfile?.setOnClickListener {
-//            selectAlbum()
-//        }
-
         profileBinding?.recyclerView?.layoutManager = LinearLayoutManager(requireContext())
         profileBinding?.recyclerView?.adapter = writeAdapter
-        
+
     }
 
     private suspend fun onWaitLoad() {
@@ -104,6 +84,8 @@ open class ProfileFragment : Fragment() {
     }
 
     private fun getUserName() {
+        lateinit var array : ArrayList<PostData>
+        val sharedPreference : SharedPreferences = requireContext().getSharedPreferences("Account", Context.MODE_PRIVATE)
         FirebaseDatabaseModule.database.child("user").addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 for (snapshot in dataSnapshot.children) {
@@ -114,17 +96,13 @@ open class ProfileFragment : Fragment() {
 
                         profileBinding?.nameText?.text = user.userName
                         profileBinding?.emailText?.text = user.userEmail
-                        key = user.key.toString()
-
-                        val storage : FirebaseStorage = FirebaseStorage.getInstance()
-                       // val storageRef: StorageReference = storage.reference.child("${user.userProfile}")
-                       // GlideApp.with(requireContext()).load(storageRef).centerCrop().into(profileBinding!!.imageProfile)
 
                         GlobalScope.launch {
                             withContext(Dispatchers.Main) {
                                 val jobToCompleted : Deferred<Boolean> = CoroutineScope(Dispatchers.Main).async {
                                     val job  : Job = GlobalScope.async {
-                                        mainViewModel?.userAccount?.value = user
+                                        Log.d("Result", "${FirebaseDatabaseModule.findBoard(user.userName!!, FirebaseDatabaseModule.NAME)}")
+                                        array = FirebaseDatabaseModule.findBoard(user.userName!!, FirebaseDatabaseModule.NAME)
                                     }
                                     job.join()
 
@@ -133,10 +111,35 @@ open class ProfileFragment : Fragment() {
                                 jobToCompleted.await()
 
                                 if(jobToCompleted.isCompleted) {
-                                    FirebaseDatabaseModule.findBoard(FirebaseDatabaseModule.users?.userName!!, writeAdapter!!, FirebaseDatabaseModule.NAME)
+                                    writeAdapter!!.setData(array)
                                 }
                             }
                         }
+
+
+//                        key = user.key.toString()
+
+//                        val storage : FirebaseStorage = FirebaseStorage.getInstance()
+//                        val storageRef: StorageReference = storage.reference.child("${user.userProfile}")
+//                        GlideApp.with(requireContext()).load(storageRef).centerCrop().into(profileBinding!!.imageProfile)
+
+//                        GlobalScope.launch {
+//                            withContext(Dispatchers.Main) {
+//                                val jobToCompleted : Deferred<Boolean> = CoroutineScope(Dispatchers.Main).async {
+//                                    val job  : Job = GlobalScope.async {
+//                                        mainViewModel?.userAccount?.value = user
+//                                    }
+//                                    job.join()
+//
+//                                    true
+//                                }
+//                                jobToCompleted.await()
+//
+//                                if(jobToCompleted.isCompleted) {
+//                                    FirebaseDatabaseModule.findBoard(FirebaseDatabaseModule.users?.userName!!, writeAdapter!!, FirebaseDatabaseModule.NAME)
+//                                }
+//                            }
+//                        }
 
                         Log.d("TAG", "${user}, ${mainViewModel?.userAccount?.value}, $mainViewModel")
 
@@ -149,50 +152,13 @@ open class ProfileFragment : Fragment() {
         })
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode != AppCompatActivity.RESULT_OK) {
-            return
-        }
-        when (requestCode) {
-            FROM_ALBUM -> {
-                makeConfirmDialog(data?.data, FROM_ALBUM)
-            }
-        }
-    }
-    private fun makeConfirmDialog(data: Uri?, flag: Int) {
 
-        val filename = "uploaded" + "_" + System.currentTimeMillis()
-        val storage : FirebaseStorage = FirebaseStorage.getInstance()
-        val storageRef: StorageReference = storage.reference.child("profiles/$filename")
-        val uploadTask: UploadTask
-        var file: Uri? = null
-
-        if (flag == FROM_ALBUM) {
-            file = data
-        }
-        uploadTask = storageRef.putFile(file!!)
-        val progressDialog = ProgressDialog(requireActivity())
-        progressDialog.setMessage("업로드중...")
-        progressDialog.show()
-
-        uploadTask.addOnFailureListener(OnFailureListener {
-            exception ->  exception.printStackTrace()
-        }).addOnSuccessListener(OnSuccessListener<Any> { taskSnapshot ->
-            progressDialog.dismiss()
-
-          database.child("user").child(firebaseUser?.key!!).setValue(User(firebaseUser.userName!!, firebaseUser.userEmail!!,
-                  firebaseUser.key , "profiles/$filename", firebaseUser.deviceToken, firebaseUser.likeGenre))
-
-        })
-    }
-
-    private fun selectAlbum() {
-        val intent = Intent(Intent.ACTION_PICK)
-        intent.type = MediaStore.Images.Media.CONTENT_TYPE
-        intent.type = "image/*"
-        startActivityForResult(intent, FROM_ALBUM)
-    }
+//    private fun selectAlbum() {
+//        val intent = Intent(Intent.ACTION_PICK)
+//        intent.type = MediaStore.Images.Media.CONTENT_TYPE
+//        intent.type = "image/*"
+//        requireActivity().startActivityForResult(intent, FROM_ALBUM)
+//    }
 
 
     companion object{
